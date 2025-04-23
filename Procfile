@@ -1,1 +1,1 @@
-web: bash bin/run.s
+web: bash bin/run.sh

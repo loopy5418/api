@@ -26,3 +26,7 @@ def custom():
 @app.route("/health")
 def health():
     return Response("OK", status=200)
+
+@app.route("/error")
+def error():
+    return jsonify({"error": "This is an error response"}), 500

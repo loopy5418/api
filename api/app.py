@@ -63,7 +63,6 @@ def system_info():
         "python_version": platform.python_version(),
         "ram_used_mb": round(ram.used / 1024**2),
         "disk_used_gb": round(disk.used / 1024**3),
-        "flask_version": Flask.__version__
     })
 
 @app.route("/seconds-to-time")

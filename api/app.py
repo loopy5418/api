@@ -7,6 +7,11 @@ from .errors import errors
 
 start_time = time.time()
 
+def format_duration(seconds):
+    hours, remainder = divmod(int(seconds), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
+
 app = Flask(__name__)
 app.register_blueprint(errors)
 
@@ -58,3 +63,9 @@ def system_info():
         "platform_release": platform.release(),
         "python_version": platform.python_version()
     })
+
+@app.route("/seconds-to-time")
+def seconds_to_time():
+    query = request.args.get("seconds")
+    final = format_duration(int(query))
+    return jsonify({"formatted_time": final})

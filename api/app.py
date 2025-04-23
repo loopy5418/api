@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, request
+from flask import Flask, Response, jsonify, request, render_template
 
 from .errors import errors
 

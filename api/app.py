@@ -45,7 +45,6 @@ def error():
 def system_info():
     boot_time = psutil.boot_time()
     uptime = time.time() - boot_time
-
     cpu_percent = psutil.cpu_percent(interval=0.5)
     ram = psutil.virtual_memory()
     disk = psutil.disk_usage('/')
@@ -61,7 +60,9 @@ def system_info():
         "uptime_seconds": int(uptime),
         "platform": platform.system(),
         "platform_release": platform.release(),
-        "python_version": platform.python_version()
+        "python_version": platform.python_version(),
+        "ram_used_mb": round(ram.used / 1024**2),
+        "disk_used_gb": round(disk.used / 1024**3),
     })
 
 @app.route("/seconds-to-time")

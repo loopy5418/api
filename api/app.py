@@ -67,5 +67,11 @@ def system_info():
 @app.route("/seconds-to-time")
 def seconds_to_time():
     query = request.args.get("seconds")
+    if query is None:
+        return jsonify({"error": "Please provide a query with your seconds. Append ?seconds=(put your number here) to your URL."}), 400
+    
+    if not query.isdigit():
+        return jsonify({"error": "Please provide a valid number."}), 400
+    
     final = format_duration(int(query))
     return jsonify({"formatted_time": final})

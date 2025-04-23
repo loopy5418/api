@@ -8,7 +8,7 @@ app.register_blueprint(errors)
 
 @app.route("/")
 def index():
-    return Response("Hello, world!", status=200)
+    return render_template("index.html")
 
 
 @app.route("/custom", methods=["POST"])

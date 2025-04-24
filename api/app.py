@@ -80,3 +80,7 @@ def seconds_to_time():
     
     final = format_duration(int(query))
     return jsonify({"formatted_time": final})
+
+@app.route("/websignin")
+def signin():
+    return render_template("signin.html")

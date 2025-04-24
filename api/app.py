@@ -1,9 +1,10 @@
-from flask import Flask, Response, jsonify, request, render_template
+from flask import Flask, Response, jsonify, request, render_template, abort
 import psutil
 import platform
 import time
 from flask import jsonify
 from .errors import errors
+import os
 
 start_time = time.time()
 
@@ -81,6 +82,17 @@ def seconds_to_time():
     final = format_duration(int(query))
     return jsonify({"formatted_time": final})
 
-@app.route("/adminsignin")
+@app.route("/admin/signin")
 def adminsignin():
     return render_template("signin.html")
+
+@app.route("/admin/restart", methods=["POST"])
+def restart_dyno():
+    key = request.headers.get("X-API-KEY")
+    allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
+
+    if key not in allowed_keys:
+        abort(403, description="Forbidden: Invalid API key")
+
+    os._exit(0)
+    return jsonify({"message": "Dyno restarting..."})

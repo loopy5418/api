@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Docs</title>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet" />
+  <script>
+    function toggleDetails(id) {
+      const element = document.getElementById(id);
+      element.classList.toggle('hidden');
+    }
+    function redirectToIndex() {
+      window.location.href = "index.html";
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+</head>
+<body class="bg-black text-white">
+  <header class="bg-yellow-500 text-black py-4 shadow-md flex items-center justify-between px-6">
+    <h1 class="text-2xl font-bold">Admin API</h1>
+    <button onclick="redirectToIndex()" class="bg-black text-yellow-400 font-semibold px-4 py-1.5 rounded-lg text-sm hover:bg-gray-800">Back to index</button>
+  </header>
+
+  <main class="p-6">
+    <p class="text-gray-700 dark:text-gray-300 text-sm">
+        Base URL: <code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">https://api.loopy5418.dev/admin</code><br>
+    </p>
+    <p class="mb-4 text-gray-300">super secret admin endpoint documentation</p>
+    <div class="mb-4 p-4 rounded-xl bg-gray-800 shadow cursor-pointer" onclick="toggleDetails('adminsignin')">
+        <span class="bg-green-600 text-white font-bold py-1 px-2 rounded text-sm">GET</span>
+        <span class="ml-2 font-mono text-white">/adminsignin</span>
+      </div>
+      <div id="adminsignin" class="hidden bg-gray-900 p-4 rounded-xl mb-4">
+        <h3 class="text-lg font-semibold mb-2">Details</h3>
+        <p class="mb-2 text-gray-400">Sign in with your admin credentials. Browser only (currently does not work)</p>
+        </p>
+        <div class="mb-2">
+          <h4 class="font-semibold">Query Parameters:</h4>
+          <ul class="list-disc list-inside text-gray-300">
+            <li><span class="font-mono">No query parameters.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mb-4 p-4 rounded-xl bg-gray-800 shadow cursor-pointer" onclick="toggleDetails('restart')">
+        <span class="bg-green-600 text-white font-bold py-1 px-2 rounded text-sm">GET</span>
+        <span class="ml-2 font-mono text-white">/restart</span>
+      </div>
+      <div id="restart" class="hidden bg-gray-900 p-4 rounded-xl mb-4">
+        <h3 class="text-lg font-semibold mb-2">Details</h3>
+        <p class="mb-2 text-gray-400">This endpoint restarts the worker dyno.</p>
+        <div class="mb-2">
+          <h4 class="font-semibold">Headers:</h4>
+          <ul class="list-disc list-inside text-gray-300">
+            <li><span class="font-mono">X-API-KEY</span>: string (your api key, required)</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-1">Example Response:</h4>
+          <pre><code class="language-json">{
+    "message": "Heroku dyno restart triggered!"
+}</code></pre>
+        </div>
+      </div>
+  </main>
+</body>
+</html>

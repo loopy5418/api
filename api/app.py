@@ -97,6 +97,9 @@ def seconds_to_time():
     
     final = format_duration(int(query))
     return jsonify({"formatted_time": final})
+@app.route("/admin")
+def adminpage():
+    return render_template("admindocs.html")
 
 @app.route("/admin/signin")
 def adminsignin():

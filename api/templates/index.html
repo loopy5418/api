@@ -102,21 +102,35 @@
       </div>
     </div>
 
-    <!-- GET /health -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-      <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-health')">
-        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
-        <span class="flex-1 ml-2 text-lg">/health</span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-utc-time')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/utc-time</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-utc-time" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+    "day": 24,
+    "day_of_week": "Thursday",
+    "day_of_year": "114",
+    "epoch_time": 1745514817,
+    "hour": 17,
+    "is_leap_year": false,
+    "iso_format": "2025-04-24T17:13:37.204512+00:00",
+    "minute": 13,
+    "month_name": "April",
+    "month_number": 4,
+    "quarter": 2,
+    "second": 37,
+    "timezone": "UTC",
+    "utc_time": "2025-04-24 17:13:37",
+    "week_of_year": "16"
+}</code></pre>
+        </div>
       </div>
-      <div id="endpoint-health" class="px-6 py-4 hidden border-t dark:border-gray-700">
-        <h3 class="font-semibold">Response Preview</h3>
-        <pre class="rounded bg-gray-900 text-white p-4 text-sm">OK</pre>
-      </div>
-    </div>
-
   </main>
 </body>
 </html>

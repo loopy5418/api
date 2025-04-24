@@ -22,19 +22,19 @@ def index():
     if "mozilla" in user_agent or "chrome" in user_agent or "safari" in user_agent:
         return render_template("index.html")
     else:
-        return jsonify({"message": "Hello from API!"})
-
-
-@app.route("/custom", methods=["POST"])
-def custom():
-    payload = request.get_json()
-
-    if payload.get("say_hello") is True:
-        output = jsonify({"message": "Hello!"})
-    else:
-        output = jsonify({"message": "..."})
-
-    return output
+        return jsonify({
+        "base_url": "https://api.loopy5418.dev",
+        "endpoints": {
+            "/": "Index page",
+            "/health": "Health check endpoint",
+            "/seconds-to-time?seconds": "Converts seconds into hh:mm:ss (requires query params)",
+            "/sysinfo": "System info (CPU, RAM, Disk, etc.)"
+        },
+        "support": {
+            "discord": "work in progress"
+        },
+        "note": "This API supports both browser and direct HTTP requests"
+    })
 
 
 @app.route("/health")

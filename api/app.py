@@ -6,6 +6,7 @@ from flask import jsonify
 from .errors import errors
 import os
 import requests
+from datetime import datetime, timezone
 
 start_time = time.time()
 
@@ -97,6 +98,28 @@ def seconds_to_time():
     
     final = format_duration(int(query))
     return jsonify({"formatted_time": final})
+
+@app.route("/utc-time")
+def utc_time():
+    utc_now = datetime.now(timezone.utc)
+    return jsonify({
+        "utc_time": utc_now.strftime("%Y-%m-%d %H:%M:%S"),
+        "day": utc_now.day,
+        "month_name": utc_now.strftime("%B"),
+        "month_number": utc_now.month,
+        "day_of_week": utc_now.strftime("%A"),
+        "hour": utc_now.hour,
+        "minute": utc_now.minute,
+        "second": utc_now.second,
+        "iso_format": utc_now.isoformat(),
+        "week_of_year": utc_now.strftime("%U"),
+        "day_of_year": utc_now.strftime("%j"),
+        "quarter": (utc_now.month - 1) // 3 + 1,
+        "is_leap_year": (utc_now.year % 4 == 0 and utc_now.year % 100 != 0) or (utc_now.year % 400 == 0),
+        "timezone": "UTC",
+        "epoch_time": int(utc_now.timestamp())
+    })
+
 @app.route("/admin")
 def adminpage():
     return render_template("admindocs.html")

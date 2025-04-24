@@ -155,6 +155,48 @@
 }</code></pre>
         </div>
       </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-base64-encrypt')">
+          <span class="bg-yellow-100 text-orange-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">POST</span>
+          <span class="flex-1 ml-2 text-lg">/base64-encrypt</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-base64-encrypt" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Request Body</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "data": "Hello, World!"
+}</code></pre>
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "encrypted_data": "SGVsbG8sIFdvcmxkIQ=="
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-base64-decrypt')">
+          <span class="bg-yellow-100 text-orange-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">POST</span>
+          <span class="flex-1 ml-2 text-lg">/base64-decrypt</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-base64-decrypt" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Request Body</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "data": "SGVsbG8sIFdvcmxkIQ=="
+}</code></pre>
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "decrypted_data": "Hello, World!"
+}</code></pre>
+        </div>
+      </div>
+
+      
   </main>
 </body>
 </html>

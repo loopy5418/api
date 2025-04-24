@@ -8,6 +8,7 @@ import os
 import requests
 from datetime import datetime, timezone
 import random
+import base64
 
 start_time = time.time()
 
@@ -50,6 +51,8 @@ def index():
             "/sysinfo": "System info (CPU, RAM, Disk, etc.)",
             "/utc-time": "Returns a wealthy amount of information about the current UTC time.",
             "/random-number?minimum=&maximum=": "Generates a random number between the minimum and maximum values (requires query params)",
+            "/base64-encrypt": "Encrypts a text with base64",
+            "/base64-decrypt": "Decrypts a text with base64",
         },
         "support": {
             "discord": "work in progress"
@@ -146,6 +149,7 @@ def utc_time():
         "epoch_time": int(utc_now.timestamp())
     })
 
+
 @app.route("/admin")
 def adminpage():
     return render_template("admindocs.html")
@@ -168,3 +172,27 @@ def restart_dyno():
         return jsonify({"message": "Heroku dyno restart triggered!"}), 202
     else:
         return jsonify({"error": "Failed to restart dyno", "response": data}), 500
+
+@app.route("/base64-encrypt", methods=["POST"])
+def base64_encrypt():
+    try:
+        data = request.json.get("data")
+        if not data:
+            return jsonify({"error": "The 'data' field is required in the request body."}), 400
+
+        encoded_data = base64.b64encode(data.encode()).decode()
+        return jsonify({"encrypted_data": encoded_data})
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+@app.route("/base64-decrypt", methods=["POST"])
+def base64_decrypt():
+    try:
+        data = request.json.get("data")
+        if not data:
+            return jsonify({"error": "The 'data' field is required in the request body."}), 400
+
+        decoded_data = base64.b64decode(data.encode()).decode()
+        return jsonify({"decrypted_data": decoded_data})
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500

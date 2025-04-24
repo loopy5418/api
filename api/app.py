@@ -5,6 +5,7 @@ import time
 from flask import jsonify
 from .errors import errors
 import os
+import requests
 
 start_time = time.time()
 
@@ -16,6 +17,21 @@ def format_duration(seconds):
 app = Flask(__name__)
 app.register_blueprint(errors)
 
+def restart_heroku_dyno():
+    app_name = os.environ.get("HEROKU_APP_NAME")
+    api_key = os.environ.get("HEROKU_API_KEY")
+
+    if not app_name or not api_key:
+        raise Exception("Missing HEROKU_APP_NAME or HEROKU_API_KEY")
+
+    url = f"https://api.heroku.com/apps/{app_name}/dynos"
+    headers = {
+        "Accept": "application/vnd.heroku+json; version=3",
+        "Authorization": f"Bearer {api_key}"
+    }
+
+    response = requests.delete(url, headers=headers)
+    return response.status_code, response.json() if response.content else {}
 
 @app.route("/")
 def index():
@@ -94,5 +110,9 @@ def restart_dyno():
     if key not in allowed_keys:
         abort(403, description="Forbidden: Invalid API key")
 
-    os._exit(0)
-    return jsonify({"message": "Dyno restarting..."})
+    code, data = restart_heroku_dyno()
+
+    if code == 202:
+        return jsonify({"message": "Heroku dyno restart triggered!"}), 202
+    else:
+        return jsonify({"error": "Failed to restart dyno", "response": data}), 500

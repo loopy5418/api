@@ -18,7 +18,11 @@ app.register_blueprint(errors)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    user_agent = request.headers.get('User-Agent', '').lower()
+    if "mozilla" in user_agent or "chrome" in user_agent or "safari" in user_agent:
+        return render_template("index.html")
+    else:
+        return jsonify({"message": "Hello from API!"})
 
 
 @app.route("/custom", methods=["POST"])

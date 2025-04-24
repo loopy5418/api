@@ -21,7 +21,20 @@
       }
     }
     function redirectToSignIn() {
-      window.location.href = "/signin";
+      fetch("/websignin")
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          } else {
+            throw new Error("Failed to load signin page");
+          }
+        })
+        .then(html => {
+          document.body.innerHTML = html;
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
     }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>

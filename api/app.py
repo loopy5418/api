@@ -7,6 +7,7 @@ from .errors import errors
 import os
 import requests
 from datetime import datetime, timezone
+import random
 
 start_time = time.time()
 
@@ -46,7 +47,9 @@ def index():
             "/": "Index page",
             "/health": "Health check endpoint",
             "/seconds-to-time?seconds": "Converts seconds into hh:mm:ss (requires query params)",
-            "/sysinfo": "System info (CPU, RAM, Disk, etc.)"
+            "/sysinfo": "System info (CPU, RAM, Disk, etc.)",
+            "/utc-time": "Returns a wealthy amount of information about the current UTC time.",
+            "/random-number?minimum=&maximum=": "Generates a random number between the minimum and maximum values (requires query params)",
         },
         "support": {
             "discord": "work in progress"
@@ -98,6 +101,20 @@ def seconds_to_time():
     
     final = format_duration(int(query))
     return jsonify({"formatted_time": final})
+
+@app.route("/random-number")
+def random_number():
+    try:
+        minimum = int(request.args.get("minimum", 0))
+        maximum = int(request.args.get("maximum", 100))
+
+        if minimum > maximum:
+            return jsonify({"error": "Minimum value cannot be greater than maximum value."}), 400
+
+        random_num = random.randint(minimum, maximum)
+        return jsonify({"result": random_num})
+    except ValueError:
+        return jsonify({"error": "Please provide valid integer values for minimum and maximum."}), 400
 
 @app.route("/utc-time")
 def utc_time():

@@ -39,7 +39,7 @@ def custom():
 
 @app.route("/health")
 def health():
-    return Response("OK", status=200)
+    return Response("OK", status=200, mimetype="text/plain")
 
 @app.route("/error")
 def error():

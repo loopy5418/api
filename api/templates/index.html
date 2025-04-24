@@ -1,10 +1,123 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="transition-colors">
 <head>
-    <title>Loopy5418 API</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Documentation</title>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet" />
+  <script>
+    function toggleDetails(id) {
+      const element = document.getElementById(id);
+      element.classList.toggle('hidden');
+    }
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+      const icon = document.getElementById('darkModeIcon');
+      if (document.documentElement.classList.contains('dark')) {
+        icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />`;
+      } else {
+        icon.innerHTML = `<circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />`;
+      }
+    }
+    function redirectToSignIn() {
+      window.location.href = "signin.html";
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
 </head>
-<body>
-    <h1>Welcome to the Loopy5418 API</h1>
-    <p>This is the index page.</p>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+  <header class="bg-blue-600 text-white py-4 shadow-md flex items-center justify-between px-6">
+    <h1 class="text-2xl font-bold">api.loopy5418.dev</h1>
+    <div class="space-x-2 flex items-center">
+      <button onclick="toggleDarkMode()" class="bg-white text-blue-600 font-semibold px-3 py-1.5 rounded-lg text-sm hover:bg-blue-100 flex items-center justify-center">
+        <svg id="darkModeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <circle cx="12" cy="12" r="5" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+        </svg>
+      </button>
+      <button onclick="redirectToSignIn()" class="bg-white text-blue-600 font-semibold px-4 py-1.5 rounded-lg text-sm hover:bg-blue-100">Sign in</button>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto mt-8 space-y-4">
+    <!-- API Description -->
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <p class="text-gray-700 dark:text-gray-300 text-sm">
+        Base URL: <code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">https://api.loopy5418.dev</code><br>
+    </p>
+    </section>
+
+    <!-- Endpoints go here -->
+<!-- GET /sysinfo -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-sysinfo')">
+        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+        <span class="flex-1 ml-2 text-lg">/sysinfo</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      <div id="endpoint-sysinfo" class="px-6 py-4 hidden border-t dark:border-gray-700">
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "cpu_cores": 4,
+  "cpu_threads": 8,
+  "cpu_usage_percent": 1.3,
+  "disk_total_gb": 0,
+  "disk_used_gb": 0,
+  "disk_used_percent": 99.5,
+  "platform": "Linux",
+  "platform_release": "5.15.0-1077-aws",
+  "python_version": "3.13.3",
+  "ram_total_mb": 63276,
+  "ram_used_mb": 31558,
+  "ram_used_percent": 51.4,
+  "uptime_seconds": 5404805
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- GET /seconds-to-time -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-seconds-to-time')">
+        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+        <span class="flex-1 ml-2 text-lg">/seconds-to-time</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      <div id="endpoint-seconds-to-time" class="px-6 py-4 hidden border-t dark:border-gray-700">
+        <h3 class="font-semibold">Query Parameters</h3>
+        <ul class="list-disc pl-6 text-sm mb-4">
+          <li><strong>seconds</strong>: Number of seconds to convert (required)</li>
+        </ul>
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "formatted_time": "01:23:20"
+}</code></pre>
+      </div>
+    </div>
+
+    <!-- GET /health -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-health')">
+        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+        <span class="flex-1 ml-2 text-lg">/health</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      <div id="endpoint-health" class="px-6 py-4 hidden border-t dark:border-gray-700">
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="rounded bg-gray-900 text-white p-4 text-sm">OK</pre>
+      </div>
+    </div>
+
+  </main>
 </body>
 </html>

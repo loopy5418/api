@@ -105,16 +105,25 @@ def seconds_to_time():
 @app.route("/random-number")
 def random_number():
     try:
-        minimum = int(request.args.get("minimum", 0))
-        maximum = int(request.args.get("maximum", 100))
+        minimum = request.args.get("minimum")
+        maximum = request.args.get("maximum")
+
+        if minimum is None or maximum is None:
+            return jsonify({"error": "Both 'minimum' and 'maximum' parameters are required."}), 400
+
+        if not minimum.isdigit() or not maximum.isdigit():
+            return jsonify({"error": "Both 'minimum' and 'maximum' must be valid integers."}), 400
+
+        minimum = int(minimum)
+        maximum = int(maximum)
 
         if minimum > maximum:
             return jsonify({"error": "Minimum value cannot be greater than maximum value."}), 400
 
         random_num = random.randint(minimum, maximum)
-        return jsonify({"result": random_num})
+        return jsonify({"random_number": random_num})
     except ValueError:
-        return jsonify({"error": "Please provide valid integer values for minimum and maximum."}), 400
+        return jsonify({"error": "An unexpected error occurred. Please check your input."}), 400
 
 @app.route("/utc-time")
 def utc_time():

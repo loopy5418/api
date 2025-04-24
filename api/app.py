@@ -5,7 +5,6 @@ import time
 from flask import jsonify
 from .errors import errors
 import os
-import requests
 
 start_time = time.time()
 
@@ -17,29 +16,6 @@ def format_duration(seconds):
 app = Flask(__name__)
 app.register_blueprint(errors)
 
-def send_discord_message(message):
-    token = os.environ.get("DISCORD_BOT_TOKEN")
-    channel_id = os.environ.get("DISCORD_CHANNEL_ID")
-    if not token or not channel_id:
-        return
-
-    url = f"https://discord.com/api/v10/channels/{channel_id}/messages"
-    headers = {
-        "Authorization": f"Bot {token}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "content": message
-    }
-
-    try:
-        requests.post(url, json=payload, headers=headers)
-    except Exception as e:
-        print(f"Failed to send Discord message: {e}")
-
-@app.before_first_request
-def notify_startup():
-    send_discord_message("🚀 API has started up!")
 
 @app.route("/")
 def index():
@@ -118,6 +94,5 @@ def restart_dyno():
     if key not in allowed_keys:
         abort(403, description="Forbidden: Invalid API key")
 
-    send_discord_message("🔄 Dyno is restarting...")
     os._exit(0)
     return jsonify({"message": "Dyno restarting..."})

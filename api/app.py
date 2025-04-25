@@ -212,7 +212,7 @@ def hash_generator():
     try:
         hash_func = getattr(hashlib, algorithm)
     except AttributeError:
-        return jsonify({"error": f"Unsupported algorithm: {algorithm}", "success": False}), 400
+        return jsonify({"error": f"Unsupported algorithm", "success": False}), 400
     hashed = hash_func(data.encode()).hexdigest()
     return jsonify({"algorithm": algorithm, "hash": hashed, "success": True})
 

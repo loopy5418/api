@@ -377,7 +377,7 @@ def emojify():
 def owoify():
     text = request.args.get("text")
     if not text:
-        return jsonify({"error": "Missing 'text' query parameter.", "status": False}), 400
+        return jsonify({"error": "Missing 'text' query parameter.", "success": False}), 400
     owo = text
     owo = owo.replace('r', 'w').replace('l', 'w')
     owo = owo.replace('R', 'W').replace('L', 'W')

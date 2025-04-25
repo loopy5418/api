@@ -44,7 +44,7 @@ def index():
     user_agent = request.headers.get('User-Agent', '').lower()
     discord_invite = os.environ.get("DISCORD_INVITE", "#")
     if "mozilla" in user_agent or "chrome" in user_agent or "safari" in user_agent:
-        return render_template("index.html")
+        return render_template("index.html", discord_invite=discord_invite)
     else:
         return jsonify({
         "base_url": "https://api.loopy5418.dev",
@@ -161,7 +161,7 @@ def utc_time():
 @app.route("/admin")
 def adminpage():
     discord_invite = os.environ.get("DISCORD_INVITE", "#")
-    return render_template("admindocs.html")
+    return render_template("admindocs.html", discord_invite=discord_invite)
 
 @app.route("/admin/signin")
 def adminsignin():

@@ -232,20 +232,20 @@ def currency_converter():
     except ValueError:
         return jsonify({"error": "'amount' must be a valid number."}), 400
     try:
-        # Using exchangerate.host free API
-        url = f"https://api.exchangerate.host/convert?from={base.upper()}&to={target.upper()}&amount={amount}"
+        # Using Frankfurter API (no API key required)
+        url = f"https://api.frankfurter.app/latest?amount={amount}&from={base.upper()}&to={target.upper()}"
         resp = get(url)
         if resp.status_code != 200:
             return jsonify({"error": "Failed to fetch exchange rate."}), 500
         data = resp.json()
-        if not data.get("success", True):
+        if target.upper() not in data.get("rates", {}):
             return jsonify({"error": f"Currency conversion failed: {data.get('error', 'Unknown error')}"}), 400
         return jsonify({
-            "base": base.upper(),
+            "base": data["base"],
             "target": target.upper(),
             "amount": amount,
-            "converted": data["result"],
-            "rate": data["info"]["rate"]
+            "converted": data["rates"][target.upper()],
+            "date": data["date"]
         })
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500

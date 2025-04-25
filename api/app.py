@@ -57,7 +57,6 @@ def index():
             "/base64-decrypt": "Decrypts a text with base64",
             "/hash-generator": "Generates a hash for the provided data using the specified algorithm (default: sha256)",
             "/uuid-generator": "Generates a random UUID",
-            "/ip-info": "Returns geolocation and ISP information for the client's IP address",
             "/currency-converter": "Converts an amount from one currency to another (requires query params)",
         },
         "support": {
@@ -240,7 +239,7 @@ def currency_converter():
             return jsonify({"error": "Failed to fetch exchange rate."}), 500
         data = resp.json()
         if not data.get("success", True):
-            return jsonify({"error": "Currency conversion failed."}), 400
+            return jsonify({"error": f"Currency conversion failed: {data.get('error', 'Unknown error')}"}), 400
         return jsonify({
             "base": base.upper(),
             "target": target.upper(),

@@ -14,6 +14,7 @@ import hashlib
 import io
 from PIL import Image, ImageDraw, ImageFont
 from flask_cors import CORS
+from googletrans import Translator
 
 start_time = time.time()
 
@@ -421,24 +422,6 @@ def choose():
     choice = random.choice(opts)
     return jsonify({"result": choice, "success": True})
 
-@app.route("/translate")
-def translate():
-    import requests
-    text = request.args.get("text")
-    to_lang = request.args.get("to")
-    from_lang = request.args.get("from", "auto")
-    if not text or not to_lang:
-        return jsonify({"error": "Missing 'text' or 'to' query parameter.", "success": False}), 400
-    # Use MyMemory Translation API (no API key required)
-    url = f"https://api.mymemory.translated.net/get?q={requests.utils.quote(text)}&langpair={from_lang}|{to_lang}"
-    resp = requests.get(url)
-    if resp.status_code == 200:
-        data = resp.json()
-        translated = data.get("responseData", {}).get("translatedText", "")
-        return jsonify({"translated": translated, "success": True})
-    else:
-        return jsonify({"error": "Translation failed.", "success": False}), 500
-
 @app.route("/webhook-send", methods=["POST"])
 def webhook_send():
     import requests
@@ -459,3 +442,16 @@ def webhook_send():
         return jsonify({"success": True})
     else:
         return jsonify({"error": f"Webhook send failed: {resp.text}", "success": False}), 500
+
+@app.route("/translate")
+def translate_text():
+    text = request.args.get("text")
+    target_lang = request.args.get("target_lang")
+    if not text or not target_lang:
+        return jsonify({"error": "Missing 'text' or 'target_lang' query parameter.", "success": False}), 400
+    translator = Translator()
+    try:
+        translated = translator.translate(text, dest=target_lang)
+        return jsonify({"translation": translated.text, "success": True})
+    except Exception as e:
+        return jsonify({"error": f"Translation failed: {str(e)}", "success": False}), 500

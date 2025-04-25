@@ -63,6 +63,8 @@ def index():
             "/uuid-generator": "Generates a random UUID",
             "/image-with-text": "Generates an image with text overlay (requires POST data)",
             "/currency-converter": "Converts an amount from one currency to another (requires query params)",
+            "/qr": "Generates a QR code from the provided data (requires query params)",
+            "/whois?domain": "Performs a WHOIS lookup for the provided domain (requires query params)",
         },
         "support": {
             "discord": f"{discord_invite}",
@@ -337,3 +339,58 @@ def image_with_text():
         return Response(img_bytes, mimetype="image/png")
     except Exception as e:
         return jsonify({"error": f"Failed to process image: {str(e)}", "success": False}), 500
+
+@app.route("/qr")
+def qr_code():
+    import qrcode
+    import io
+    data = request.args.get("data")
+    if not data:
+        return jsonify({"error": "Missing 'data' query parameter.", "success": False}), 400
+    img = qrcode.make(data)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return Response(buf, mimetype="image/png")
+
+@app.route("/whois")
+def whois_lookup():
+    import subprocess
+    import re
+    domain = request.args.get("domain")
+    if not domain:
+        return jsonify({"error": "Missing 'domain' query parameter.", "success": False}), 400
+    try:
+        result = subprocess.run(["whois", domain], capture_output=True, text=True, timeout=10)
+        if result.returncode == 0:
+            output = result.stdout
+            # Parse common fields
+            fields = {
+                "domain_name": r"Domain Name:\s*(.+)",
+                "registrar": r"Registrar:\s*(.+)",
+                "registrant": r"Registrant(?: Name)?:\s*(.+)",
+                "creation_date": r"Creation Date:\s*(.+)",
+                "expiration_date": r"Expir(?:y|ation) Date:\s*(.+)",
+                "updated_date": r"Updated Date:\s*(.+)",
+                "status": r"Status:\s*(.+)",
+                "name_servers": r"Name Server:\s*(.+)",
+                "emails": r"Email:\s*(.+)",
+                "phone": r"Phone:\s*(.+)",
+                "country": r"Country:\s*(.+)",
+                "success": True
+            }
+            parsed = {}
+            for key, pattern in fields.items():
+                if key == "name_servers":
+                    parsed[key] = re.findall(pattern, output, re.IGNORECASE)
+                elif key == "emails":
+                    parsed[key] = re.findall(pattern, output, re.IGNORECASE)
+                else:
+                    match = re.search(pattern, output, re.IGNORECASE)
+                    if match:
+                        parsed[key] = match.group(1).strip()
+            return jsonify(parsed)
+        else:
+            return jsonify({"error": "WHOIS lookup failed.", "success": False}), 500
+    except Exception as e:
+        return jsonify({"error": f"WHOIS lookup error: {str(e)}", "success": False}), 500

@@ -153,7 +153,7 @@ def utc_time():
         "week_of_year": utc_now.strftime("%U"),
         "day_of_year": utc_now.strftime("%j"),
         "quarter": (utc_now.month - 1) // 3 + 1,
-        "is_leap_year": (utc_now.year % 4 == 0 and utc_now year % 100 != 0) or (utc_now.year % 400 == 0),
+        "is_leap_year": (utc_now.year % 4 == 0 and utc_now.year % 100 != 0) or (utc_now.year % 400 == 0),
         "timezone": "UTC",
         "epoch_time": int(utc_now.timestamp()),
         "year": utc_now.year,

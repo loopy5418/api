@@ -445,13 +445,13 @@ def webhook_send():
 
 @app.route("/translate")
 def translate_text():
-    text = request.args.get("text")
-    target_lang = request.args.get("target_lang")
-    if not text or not target_lang:
-        return jsonify({"error": "Missing 'text' or 'target_lang' query parameter.", "success": False}), 400
+    prompt = request.args.get("text")
+    target_lang = request.args.get("to")
+    if not prompt or not target_lang:
+        return jsonify({"error": "Missing 'text' or 'to' query parameter.", "success": False}), 400
     translator = Translator()
     try:
-        translated = translator.translate(text, dest=target_lang)
+        translated = translator.translate(prompt, dest=target_lang)
         return jsonify({"translation": translated.text, "success": True})
     except Exception as e:
         return jsonify({"error": f"Translation failed: {str(e)}", "success": False}), 500

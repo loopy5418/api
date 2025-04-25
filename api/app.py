@@ -184,37 +184,37 @@ def base64_encrypt():
     try:
         data = request.json.get("data")
         if not data:
-            return jsonify({"error": "The 'data' field is required in the request body."}), 400
+            return jsonify({"error": "The 'data' field is required in the request body.", "success": False}), 400
 
         encoded_data = base64.b64encode(data.encode()).decode()
-        return jsonify({"encrypted_data": encoded_data})
+        return jsonify({"encrypted_data": encoded_data, "success": True})
     except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        return jsonify({"error": f"An error occurred: {str(e)}", "success": False}), 500
 
 @app.route("/base64-decrypt", methods=["POST"])
 def base64_decrypt():
     try:
         data = request.json.get("data")
         if not data:
-            return jsonify({"error": "The 'data' field is required in the request body."}), 400
+            return jsonify({"error": "The 'data' field is required in the request body.", "success": False}), 400
 
         decoded_data = base64.b64decode(data.encode()).decode()
-        return jsonify({"decrypted_data": decoded_data})
+        return jsonify({"decrypted_data": decoded_data, "success": True})
     except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        return jsonify({"error": f"An error occurred: {str(e)}", "success": False}), 500
 
 @app.route("/hash-generator", methods=["POST"])
 def hash_generator():
     data = request.json.get("data")
     algorithm = request.json.get("algorithm", "sha256")
     if not data:
-        return jsonify({"error": "The 'data' field is required in the request body."}), 400
+        return jsonify({"error": "The 'data' field is required in the request body.", "success": False}), 400
     try:
         hash_func = getattr(hashlib, algorithm)
     except AttributeError:
-        return jsonify({"error": f"Unsupported algorithm: {algorithm}"}), 400
+        return jsonify({"error": f"Unsupported algorithm: {algorithm}", "success": False}), 400
     hashed = hash_func(data.encode()).hexdigest()
-    return jsonify({"algorithm": algorithm, "hash": hashed})
+    return jsonify({"algorithm": algorithm, "hash": hashed, "success": True})
 
 @app.route("/uuid-generator", methods=["GET"])
 def uuid_generator():

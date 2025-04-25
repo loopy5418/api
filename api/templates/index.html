@@ -286,6 +286,37 @@
 }</code></pre>
         </div>
       </div>
+
+      <!-- POST /image-with-text -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-image-with-text')">
+          <span class="bg-yellow-100 text-orange-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">POST</span>
+          <span class="flex-1 ml-2 text-lg">/image-with-text</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-image-with-text" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Request Body</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "image_url": "https://example.com/image.png",
+  "text": "Hello World!",
+  "position": "center", // or "top", "bottom", or [x, y] or "(x, y)"
+  "color": "#FF0000",
+  "font_size": 32
+}</code></pre>
+          <h3 class="font-semibold">Position Options</h3>
+          <ul class="list-disc pl-6 text-sm mb-4">
+            <li><strong>"top"</strong>: Centered at the top of the image</li>
+            <li><strong>"center"</strong>: Centered in the middle of the image</li>
+            <li><strong>"bottom"</strong>: Centered at the bottom of the image</li>
+            <li><strong>[x, y]</strong>: Custom pixel coordinates as an array (e.g., [50, 100])</li>
+            <li><strong>"(x, y)"</strong>: Custom pixel coordinates as a string (e.g., "(50, 100)")</li>
+          </ul>
+          <h3 class="font-semibold">Response</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Returns a PNG image with the specified text drawn on it.</p>
+        </div>
+      </div>
       
   </main>
 </body>

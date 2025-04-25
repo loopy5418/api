@@ -11,7 +11,8 @@ import random
 import base64
 import uuid
 import hashlib
-
+import io
+from PIL import Image, ImageDraw, ImageFont
 
 start_time = time.time()
 
@@ -59,6 +60,7 @@ def index():
             "/base64-decrypt": "Decrypts a text with base64",
             "/hash-generator": "Generates a hash for the provided data using the specified algorithm (default: sha256)",
             "/uuid-generator": "Generates a random UUID",
+            "/image-with-text": "Generates an image with text overlay (requires POST data)",
             "/currency-converter": "Converts an amount from one currency to another (requires query params)",
         },
         "support": {
@@ -259,3 +261,59 @@ def currency_converter():
 def support_redirect():
     discord_invite = os.environ.get("DISCORD_INVITE", "#")
     return redirect(discord_invite)
+
+@app.route("/image-with-text", methods=["POST"])
+def image_with_text():
+    data = request.json
+    image_url = data.get("image_url")
+    text = data.get("text")
+    position = data.get("position", (10, 10))  # Default position (x, y) or string
+    color = data.get("color", "#FFFFFF")      # Default color: white
+    font_size = data.get("font_size", 32)      # Default font size
+
+    if not image_url or not text:
+        return jsonify({"error": "'image_url' and 'text' are required fields.", "success": False}), 400
+
+    try:
+        # Download the image
+        response = requests.get(image_url)
+        image = Image.open(io.BytesIO(response.content)).convert("RGBA")
+        draw = ImageDraw.Draw(image)
+        try:
+            font = ImageFont.truetype("arial.ttf", font_size)
+        except Exception:
+            font = ImageFont.load_default()
+
+        # Calculate position
+        width, height = image.size
+        text_width, text_height = draw.textsize(text, font=font)
+        if isinstance(position, str):
+            pos = position.lower().strip()
+            if pos == "top":
+                position = ((width - text_width) // 2, 10)
+            elif pos == "center":
+                position = ((width - text_width) // 2, (height - text_height) // 2)
+            elif pos == "bottom":
+                position = ((width - text_width) // 2, height - text_height - 10)
+            else:
+                # Try to parse as tuple
+                try:
+                    position = tuple(map(int, pos.strip("() ").split(",")))
+                except Exception:
+                    position = (10, 10)
+        elif isinstance(position, (list, tuple)) and len(position) == 2:
+            position = tuple(position)
+        else:
+            position = (10, 10)
+
+        # Draw the text
+        draw.text(position, text, fill=color, font=font)
+
+        # Save to bytes
+        img_bytes = io.BytesIO()
+        image.save(img_bytes, format="PNG")
+        img_bytes.seek(0)
+        return Response(img_bytes, mimetype="image/png")
+    except Exception as e:
+        return jsonify({"error": f"Failed to process image: {str(e)}", "success": False}), 500
+

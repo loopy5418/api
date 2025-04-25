@@ -67,7 +67,9 @@ def index():
             "/emojify": "Converts text to emoji representation (requires query params)",
             "/owoify": "Converts text to owo representation (requires query params)",
             "/choose": "Randomly chooses an option from a comma-separated list (requires query params)",
-            "/wifi-qr": "Generates a WiFi QR code from ssid, password, security, and hidden query parameters."
+            "/wifi-qr": "Generates a WiFi QR code from ssid, password, security, and hidden query parameters.",
+            "/translate": "Translates text",
+            "/webhook-send": "Sends a message to a Discord webhook (requires POST data)"
         },
         "support": {
             "discord": f"{discord_invite}",
@@ -112,13 +114,13 @@ def system_info():
 def seconds_to_time():
     query = request.args.get("seconds")
     if query is None:
-        return jsonify({"error": "Please provide a query with your seconds. Append ?seconds=(put your number here) to your URL."}), 400
+        return jsonify({"error": "Please provide a query with your seconds. Append ?seconds=(put your number here) to your URL.", "success": False}), 400
     
     if not query.isdigit():
-        return jsonify({"error": "Please provide a valid number."}), 400
+        return jsonify({"error": "Please provide a valid number.", "success": False}), 400
     
     final = format_duration(int(query))
-    return jsonify({"formatted_time": final})
+    return jsonify({"formatted_time": final, "success": True})
 
 @app.route("/random-number")
 def random_number():
@@ -127,21 +129,21 @@ def random_number():
         maximum = request.args.get("maximum")
 
         if minimum is None or maximum is None:
-            return jsonify({"error": "Both 'minimum' and 'maximum' parameters are required."}), 400
+            return jsonify({"error": "Both 'minimum' and 'maximum' parameters are required.", "success": False}), 400
 
         if not minimum.isdigit() or not maximum.isdigit():
-            return jsonify({"error": "Both 'minimum' and 'maximum' must be valid integers."}), 400
+            return jsonify({"error": "Both 'minimum' and 'maximum' must be valid integers.", "success": False}), 400
 
         minimum = int(minimum)
         maximum = int(maximum)
 
         if minimum > maximum:
-            return jsonify({"error": "Minimum value cannot be greater than maximum value."}), 400
+            return jsonify({"error": "Minimum value cannot be greater than maximum value.", "success": False}), 400
 
         random_num = random.randint(minimum, maximum)
-        return jsonify({"random_number": random_num})
+        return jsonify({"random_number": random_num, "success": True})
     except ValueError:
-        return jsonify({"error": "An unexpected error occurred. Please check your input."}), 400
+        return jsonify({"error": "An unexpected error occurred. Please check your input.", "success": False}), 400
 
 @app.route("/utc-time")
 def utc_time():
@@ -163,7 +165,8 @@ def utc_time():
         "timezone": "UTC",
         "epoch_time": int(utc_now.timestamp()),
         "year": utc_now.year,
-        "year_short": int(str(utc_now.year)[-2:])
+        "year_short": int(str(utc_now.year)[-2:]),
+        "success": True
     })
 
 @app.route("/admin")
@@ -229,7 +232,7 @@ def hash_generator():
 
 @app.route("/uuid-generator", methods=["GET"])
 def uuid_generator():
-    return jsonify({"uuid": str(uuid.uuid4())})
+    return jsonify({"uuid": str(uuid.uuid4()), "success": True})
 
 @app.route("/currency-converter")
 def currency_converter():
@@ -238,17 +241,17 @@ def currency_converter():
     target = request.args.get("target")
     amount = request.args.get("amount")
     if not base or not target or not amount:
-        return jsonify({"error": "Parameters 'base', 'target', and 'amount' are required."}), 400
+        return jsonify({"error": "Parameters 'base', 'target', and 'amount' are required.", "success": False}), 400
     try:
         amount = float(amount)
     except ValueError:
-        return jsonify({"error": "'amount' must be a valid number."}), 400
+        return jsonify({"error": "'amount' must be a valid number.", "success": False}), 400
     try:
         # Using Frankfurter API (no API key required)
         url = f"https://api.frankfurter.app/latest?amount={amount}&from={base.upper()}&to={target.upper()}"
         resp = get(url)
         if resp.status_code != 200:
-            return jsonify({"error": "Failed to fetch exchange rate."}), 500
+            return jsonify({"error": "Failed to fetch exchange rate.", "success": False}), 500
         data = resp.json()
         if target.upper() not in data.get("rates", {}):
             return jsonify({"error": f"Currency conversion failed: {data.get('error', 'Unknown error')}", "success": False}), 400
@@ -377,7 +380,7 @@ def wifi_qr():
 def emojify():
     text = request.args.get("text")
     if not text:
-        return jsonify({"error": "Missing 'text' query parameter."}), 400
+        return jsonify({"error": "Missing 'text' query parameter.", "success": False}), 400
     def to_emoji(c):
         if c.isalpha():
             return f":regional_indicator_{c.lower()}:"
@@ -389,7 +392,7 @@ def emojify():
         else:
             return c
     result = ' '.join(to_emoji(c) for c in text)
-    return jsonify({"result": result})
+    return jsonify({"result": result, "success": True})
 
 @app.route("/owoify")
 def owoify():
@@ -417,3 +420,42 @@ def choose():
     import random
     choice = random.choice(opts)
     return jsonify({"result": choice, "success": True})
+
+@app.route("/translate")
+def translate():
+    import requests
+    text = request.args.get("text")
+    to_lang = request.args.get("to")
+    from_lang = request.args.get("from", "auto")
+    if not text or not to_lang:
+        return jsonify({"error": "Missing 'text' or 'to' query parameter.", "success": False}), 400
+    # Use MyMemory Translation API (no API key required)
+    url = f"https://api.mymemory.translated.net/get?q={requests.utils.quote(text)}&langpair={from_lang}|{to_lang}"
+    resp = requests.get(url)
+    if resp.status_code == 200:
+        data = resp.json()
+        translated = data.get("responseData", {}).get("translatedText", "")
+        return jsonify({"translated": translated, "success": True})
+    else:
+        return jsonify({"error": "Translation failed.", "success": False}), 500
+
+@app.route("/webhook-send", methods=["POST"])
+def webhook_send():
+    import requests
+    data = request.json
+    url = data.get("url")
+    content = data.get("content")
+    username = data.get("username")
+    avatar_url = data.get("avatar_url")
+    if not url or not content:
+        return jsonify({"error": "'url' and 'content' are required fields.", "success": False}), 400
+    payload = {"content": content}
+    if username:
+        payload["username"] = username
+    if avatar_url:
+        payload["avatar_url"] = avatar_url
+    resp = requests.post(url, json=payload)
+    if resp.status_code in (200, 204):
+        return jsonify({"success": True})
+    else:
+        return jsonify({"error": f"Webhook send failed: {resp.text}", "success": False}), 500

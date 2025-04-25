@@ -64,7 +64,9 @@ def index():
             "/image-with-text": "Generates an image with text overlay (requires POST data)",
             "/currency-converter": "Converts an amount from one currency to another (requires query params)",
             "/qr": "Generates a QR code from the provided data (requires query params)",
-            "/whois?domain": "Performs a WHOIS lookup for the provided domain (requires query params)",
+            "/emojify": "Converts text to emoji representation (requires query params)",
+            "/owoify": "Converts text to owo representation (requires query params)",
+            "/choose": "Randomly chooses an option from a comma-separated list (requires query params)"
         },
         "support": {
             "discord": f"{discord_invite}",
@@ -353,44 +355,47 @@ def qr_code():
     buf.seek(0)
     return Response(buf, mimetype="image/png")
 
-@app.route("/whois")
-def whois_lookup():
-    import subprocess
-    import re
-    domain = request.args.get("domain")
-    if not domain:
-        return jsonify({"error": "Missing 'domain' query parameter.", "success": False}), 400
-    try:
-        result = subprocess.run(["whois", domain], capture_output=True, text=True, timeout=10)
-        if result.returncode == 0:
-            output = result.stdout
-            # Parse common fields
-            fields = {
-                "domain_name": r"Domain Name:\s*(.+)",
-                "registrar": r"Registrar:\s*(.+)",
-                "registrant": r"Registrant(?: Name)?:\s*(.+)",
-                "creation_date": r"Creation Date:\s*(.+)",
-                "expiration_date": r"Expir(?:y|ation) Date:\s*(.+)",
-                "updated_date": r"Updated Date:\s*(.+)",
-                "status": r"Status:\s*(.+)",
-                "name_servers": r"Name Server:\s*(.+)",
-                "emails": r"Email:\s*(.+)",
-                "phone": r"Phone:\s*(.+)",
-                "country": r"Country:\s*(.+)",
-                "success": True
-            }
-            parsed = {}
-            for key, pattern in fields.items():
-                if key == "name_servers":
-                    parsed[key] = re.findall(pattern, output, re.IGNORECASE)
-                elif key == "emails":
-                    parsed[key] = re.findall(pattern, output, re.IGNORECASE)
-                else:
-                    match = re.search(pattern, output, re.IGNORECASE)
-                    if match:
-                        parsed[key] = match.group(1).strip()
-            return jsonify(parsed)
+@app.route("/emojify")
+def emojify():
+    text = request.args.get("text")
+    if not text:
+        return jsonify({"error": "Missing 'text' query parameter.", "success": False}), 400
+    def to_emoji(c):
+        if c.isalpha():
+            return f":regional_indicator_{c.lower()}:"
+        elif c.isdigit():
+            nums = ["zero","one","two","three","four","five","six","seven","eight","nine"]
+            return f":{nums[int(c)]}:"
+        elif c == ' ':
+            return '   '
         else:
-            return jsonify({"error": "WHOIS lookup failed.", "success": False}), 500
-    except Exception as e:
-        return jsonify({"error": f"WHOIS lookup error: {str(e)}", "success": False}), 500
+            return c
+    result = ' '.join(to_emoji(c) for c in text)
+    return jsonify({"result": result, "success": True})
+
+@app.route("/owoify")
+def owoify():
+    text = request.args.get("text")
+    if not text:
+        return jsonify({"error": "Missing 'text' query parameter.", "status": False}), 400
+    owo = text
+    owo = owo.replace('r', 'w').replace('l', 'w')
+    owo = owo.replace('R', 'W').replace('L', 'W')
+    owo = owo.replace('no', 'nyo').replace('No', 'Nyo')
+    owo = owo.replace('ove', 'uv')
+    faces = [';;w;;', 'owo', 'UwU', '>w<', '^w^']
+    import random
+    owo += ' ' + random.choice(faces)
+    return jsonify({"result": owo, "success": True})
+
+@app.route("/choose")
+def choose():
+    options = request.args.get("options")
+    if not options:
+        return jsonify({"error": "Missing 'options' query parameter.", "success": False}), 400
+    opts = [o.strip() for o in options.split(",") if o.strip()]
+    if not opts:
+        return jsonify({"error": "No valid options provided.", "success": False}), 400
+    import random
+    choice = random.choice(opts)
+    return jsonify({"result": choice, "success": True})

@@ -336,4 +336,3 @@ def image_with_text():
         return Response(img_bytes, mimetype="image/png")
     except Exception as e:
         return jsonify({"error": f"Failed to process image: {str(e)}", "success": False}), 500
-

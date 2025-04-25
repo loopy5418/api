@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Info Viewer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    async function fetchSysInfo() {
+      try {
+        const res = await fetch('https://api.loopy5418.dev/sysinfo');
+        const data = await res.json();
+        document.getElementById('cpu_cores').textContent = data.cpu_cores;
+        document.getElementById('cpu_threads').textContent = data.cpu_threads;
+        document.getElementById('cpu_usage_percent').textContent = data.cpu_usage_percent + '%';
+        document.getElementById('ram_total_mb').textContent = data.ram_total_mb + ' MB';
+        document.getElementById('ram_used_mb').textContent = data.ram_used_mb + ' MB';
+        document.getElementById('ram_used_percent').textContent = data.ram_used_percent + '%';
+        document.getElementById('disk_total_gb').textContent = data.disk_total_gb + ' GB';
+        document.getElementById('disk_used_gb').textContent = data.disk_used_gb + ' GB';
+        document.getElementById('disk_used_percent').textContent = data.disk_used_percent + '%';
+        document.getElementById('platform').textContent = data.platform;
+        document.getElementById('platform_release').textContent = data.platform_release;
+        document.getElementById('python_version').textContent = data.python_version;
+        document.getElementById('uptime_seconds').textContent = data.uptime_seconds + ' s';
+      } catch (e) {
+        document.getElementById('error').textContent = 'Failed to fetch system info.';
+      }
+    }
+    setInterval(fetchSysInfo, 2000);
+    window.onload = fetchSysInfo;
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-xl">
+    <h1 class="text-2xl font-bold mb-6 text-blue-700">System Info Viewer</h1>
+    <div id="error" class="text-red-500 mb-2"></div>
+    <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-gray-800">
+      <div>CPU Cores:</div><div id="cpu_cores"></div>
+      <div>CPU Threads:</div><div id="cpu_threads"></div>
+      <div>CPU Usage:</div><div id="cpu_usage_percent"></div>
+      <div>RAM Total:</div><div id="ram_total_mb"></div>
+      <div>RAM Used:</div><div id="ram_used_mb"></div>
+      <div>RAM Used %:</div><div id="ram_used_percent"></div>
+      <div>Disk Total:</div><div id="disk_total_gb"></div>
+      <div>Disk Used:</div><div id="disk_used_gb"></div>
+      <div>Disk Used %:</div><div id="disk_used_percent"></div>
+      <div>Platform:</div><div id="platform"></div>
+      <div>Platform Release:</div><div id="platform_release"></div>
+      <div>Python Version:</div><div id="python_version"></div>
+      <div>Uptime:</div><div id="uptime_seconds"></div>
+    </div>
+  </div>
+</body>
+</html>

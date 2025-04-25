@@ -153,7 +153,7 @@ def utc_time():
         "week_of_year": utc_now.strftime("%U"),
         "day_of_year": utc_now.strftime("%j"),
         "quarter": (utc_now.month - 1) // 3 + 1,
-        "is_leap_year": (utc_now.year % 4 == 0 and utc_now.year % 100 != 0) or (utc_now.year % 400 == 0),
+        "is_leap_year": (utc_now.year % 4 == 0 and utc_now year % 100 != 0) or (utc_now.year % 400 == 0),
         "timezone": "UTC",
         "epoch_time": int(utc_now.timestamp()),
         "year": utc_now.year,
@@ -288,7 +288,12 @@ def image_with_text():
         except Exception:
             font = ImageFont.load_default()
         width, height = image.size
-        text_width, text_height = draw.textsize(text, font=font)
+        # Calculate text size (compatibility for Pillow >=10)
+        try:
+            bbox = draw.textbbox((0, 0), text, font=font)
+            text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
+        except AttributeError:
+            text_width, text_height = font.getsize(text)
         if isinstance(position, str):
             pos = position.lower().strip()
             if pos == "top":

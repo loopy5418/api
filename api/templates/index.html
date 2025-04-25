@@ -418,6 +418,30 @@
 }</code></pre>
         </div>
       </div>
+
+      <!-- GET /wifi-qr -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-wifi-qr')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/wifi-qr</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-wifi-qr" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Query Parameters</h3>
+          <ul class="list-disc pl-6 text-sm mb-4">
+            <li><strong>ssid</strong>: WiFi network name (required)</li>
+            <li><strong>password</strong>: WiFi password (optional, default: empty)</li>
+            <li><strong>security</strong>: Security type (WPA, WEP, nopass; optional, default: WPA)</li>
+            <li><strong>hidden</strong>: Whether the network is hidden (true/false; optional, default: false)</li>
+          </ul>
+          <h3 class="font-semibold">Example URL</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/wifi-qr?ssid=MyWiFi&password=MyPass123&security=WPA&hidden=false</p>
+          <h3 class="font-semibold">Response</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Returns a PNG image of a QR code that allows devices to connect to the specified WiFi network.</p>
+        </div>
+      </div>
   </main>
 </body>
 </html>

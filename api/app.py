@@ -66,7 +66,8 @@ def index():
             "/qr": "Generates a QR code from the provided data (requires query params)",
             "/emojify": "Converts text to emoji representation (requires query params)",
             "/owoify": "Converts text to owo representation (requires query params)",
-            "/choose": "Randomly chooses an option from a comma-separated list (requires query params)"
+            "/choose": "Randomly chooses an option from a comma-separated list (requires query params)",
+            "/wifi-qr": "Generates a WiFi QR code from ssid, password, security, and hidden query parameters."
         },
         "support": {
             "discord": f"{discord_invite}",
@@ -350,6 +351,23 @@ def qr_code():
     if not data:
         return jsonify({"error": "Missing 'data' query parameter.", "success": False}), 400
     img = qrcode.make(data)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    return Response(buf, mimetype="image/png")
+
+@app.route("/wifi-qr")
+def wifi_qr():
+    import qrcode
+    import io
+    ssid = request.args.get("ssid")
+    password = request.args.get("password", "")
+    security = request.args.get("security", "WPA")
+    hidden = request.args.get("hidden", "false").lower() == "true"
+    if not ssid:
+        return jsonify({"error": "Missing 'ssid' query parameter.", "success": False}), 400
+    qr_data = f"WIFI:T:{security};S:{ssid};P:{password};{'H:true;' if hidden else ''};"
+    img = qrcode.make(qr_data)
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     buf.seek(0)

@@ -3,3 +3,4 @@ gunicorn
 psutil
 requests
 Pillow
+flask-cors

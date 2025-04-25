@@ -279,9 +279,13 @@ def image_with_text():
         # Download the image with a user-agent header
         headers = {"User-Agent": "Mozilla/5.0 (compatible; ImageBot/1.0)"}
         response = requests.get(image_url, headers=headers, timeout=10)
+        if int(response.headers.get("Content-Length", 0)) > 8 * 1024 * 1024:
+            return jsonify({"error": "File too big!", "success": False}), 400
         content_type = response.headers.get("Content-Type", "")
         if not content_type.startswith("image/"):
             return jsonify({"error": f"URL did not return an image. Content-Type: {content_type}", "success": False}), 400
+        if len(response.content) > 8 * 1024 * 1024:
+            return jsonify({"error": "File too big!", "success": False}), 400
         image = Image.open(io.BytesIO(response.content)).convert("RGBA")
         draw = ImageDraw.Draw(image)
         try:

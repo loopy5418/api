@@ -240,13 +240,14 @@ def currency_converter():
             return jsonify({"error": "Failed to fetch exchange rate."}), 500
         data = resp.json()
         if target.upper() not in data.get("rates", {}):
-            return jsonify({"error": f"Currency conversion failed: {data.get('error', 'Unknown error')}"}), 400
+            return jsonify({"error": f"Currency conversion failed: {data.get('error', 'Unknown error')}", "success": False}), 400
         return jsonify({
             "base": data["base"],
             "target": target.upper(),
             "amount": amount,
             "converted": data["rates"][target.upper()],
-            "date": data["date"]
+            "date": data["date"],
+            "success": True
         })
     except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        return jsonify({"error": f"An error occurred: {str(e)}", "success": False}), 500

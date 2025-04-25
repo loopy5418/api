@@ -267,24 +267,26 @@ def image_with_text():
     data = request.json
     image_url = data.get("image_url")
     text = data.get("text")
-    position = data.get("position", (10, 10))  # Default position (x, y) or string
-    color = data.get("color", "#FFFFFF")      # Default color: white
-    font_size = data.get("font_size", 32)      # Default font size
+    position = data.get("position", (10, 10))
+    color = data.get("color", "#FFFFFF")
+    font_size = data.get("font_size", 32)
 
     if not image_url or not text:
         return jsonify({"error": "'image_url' and 'text' are required fields.", "success": False}), 400
 
     try:
-        # Download the image
-        response = requests.get(image_url)
+        # Download the image with a user-agent header
+        headers = {"User-Agent": "Mozilla/5.0 (compatible; ImageBot/1.0)"}
+        response = requests.get(image_url, headers=headers, timeout=10)
+        content_type = response.headers.get("Content-Type", "")
+        if not content_type.startswith("image/"):
+            return jsonify({"error": f"URL did not return an image. Content-Type: {content_type}", "success": False}), 400
         image = Image.open(io.BytesIO(response.content)).convert("RGBA")
         draw = ImageDraw.Draw(image)
         try:
             font = ImageFont.truetype("arial.ttf", font_size)
         except Exception:
             font = ImageFont.load_default()
-
-        # Calculate position
         width, height = image.size
         text_width, text_height = draw.textsize(text, font=font)
         if isinstance(position, str):
@@ -296,7 +298,6 @@ def image_with_text():
             elif pos == "bottom":
                 position = ((width - text_width) // 2, height - text_height - 10)
             else:
-                # Try to parse as tuple
                 try:
                     position = tuple(map(int, pos.strip("() ").split(",")))
                 except Exception:
@@ -305,11 +306,7 @@ def image_with_text():
             position = tuple(position)
         else:
             position = (10, 10)
-
-        # Draw the text
         draw.text(position, text, fill=color, font=font)
-
-        # Save to bytes
         img_bytes = io.BytesIO()
         image.save(img_bytes, format="PNG")
         img_bytes.seek(0)

@@ -151,9 +151,10 @@ def utc_time():
         "quarter": (utc_now.month - 1) // 3 + 1,
         "is_leap_year": (utc_now.year % 4 == 0 and utc_now.year % 100 != 0) or (utc_now.year % 400 == 0),
         "timezone": "UTC",
-        "epoch_time": int(utc_now.timestamp())
+        "epoch_time": int(utc_now.timestamp()),
+        "year": utc_now.year,
+        "year_short": int(str(utc_now.year)[-2:])
     })
-
 
 @app.route("/admin")
 def adminpage():

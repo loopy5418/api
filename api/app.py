@@ -42,6 +42,7 @@ def restart_heroku_dyno():
 @app.route("/")
 def index():
     user_agent = request.headers.get('User-Agent', '').lower()
+    discord_invite = os.environ.get("DISCORD_INVITE", "#")
     if "mozilla" in user_agent or "chrome" in user_agent or "safari" in user_agent:
         return render_template("index.html")
     else:
@@ -61,7 +62,7 @@ def index():
             "/currency-converter": "Converts an amount from one currency to another (requires query params)",
         },
         "support": {
-            "discord": "work in progress"
+            "discord": f"{discord_invite}",
         },
         "note": "This API supports both browser and direct HTTP requests"
     })
@@ -159,6 +160,7 @@ def utc_time():
 
 @app.route("/admin")
 def adminpage():
+    discord_invite = os.environ.get("DISCORD_INVITE", "#")
     return render_template("admindocs.html")
 
 @app.route("/admin/signin")

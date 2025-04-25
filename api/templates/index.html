@@ -196,6 +196,112 @@
         </div>
       </div>
 
+      <!-- POST /hash-generator -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-hash-generator')">
+          <span class="bg-yellow-100 text-orange-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">POST</span>
+          <span class="flex-1 ml-2 text-lg">/hash-generator</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-hash-generator" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Supported Algorithms</h3>
+          <ul class="list-disc pl-6 text-sm mb-4">
+            <li>md5</li>
+            <li>sha1</li>
+            <li>sha224</li>
+            <li>sha256</li>
+            <li>sha384</li>
+            <li>sha512</li>
+            <li>sha3_224</li>
+            <li>sha3_256</li>
+            <li>sha3_384</li>
+            <li>sha3_512</li>
+            <li>blake2b</li>
+            <li>blake2s</li>
+          </ul>
+          <h3 class="font-semibold">Request Body</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "data": "hello world",
+  "algorithm": "sha256"
+}</code></pre>
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "algorithm": "sha256",
+  "hash": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- GET /uuid-generator -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-uuid-generator')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/uuid-generator</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-uuid-generator" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "uuid": "123e4567-e89b-12d3-a456-426614174000"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- GET /ip-info -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-ip-info')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/ip-info</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-ip-info" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "ip": "8.8.8.8",
+  "city": "Mountain View",
+  "region": "California",
+  "country": "US",
+  "loc": "37.3860,-122.0840",
+  "org": "AS15169 Google LLC",
+  "timezone": "America/Los_Angeles"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- GET /currency-converter -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-currency-converter')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/currency-converter</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-currency-converter" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Query Parameters</h3>
+          <ul class="list-disc pl-6 text-sm mb-4">
+            <li><strong>base</strong>: The base currency code (e.g., USD)</li>
+            <li><strong>target</strong>: The target currency code (e.g., EUR)</li>
+            <li><strong>amount</strong>: The amount to convert</li>
+          </ul>
+          <h3 class="font-semibold">Example URL</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/currency-converter?base=USD&target=EUR&amount=10</p>
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "base": "USD",
+  "target": "EUR",
+  "amount": 10,
+  "converted": 9.25,
+  "rate": 0.925
+}</code></pre>
+        </div>
+      </div>
       
   </main>
 </body>

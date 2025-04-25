@@ -9,6 +9,8 @@ import requests
 from datetime import datetime, timezone
 import random
 import base64
+import uuid
+import hashlib
 
 start_time = time.time()
 
@@ -53,6 +55,10 @@ def index():
             "/random-number?minimum=&maximum=": "Generates a random number between the minimum and maximum values (requires query params)",
             "/base64-encrypt": "Encrypts a text with base64",
             "/base64-decrypt": "Decrypts a text with base64",
+            "/hash-generator": "Generates a hash for the provided data using the specified algorithm (default: sha256)",
+            "/uuid-generator": "Generates a random UUID",
+            "/ip-info": "Returns geolocation and ISP information for the client's IP address",
+            "/currency-converter": "Converts an amount from one currency to another (requires query params)",
         },
         "support": {
             "discord": "work in progress"
@@ -194,5 +200,53 @@ def base64_decrypt():
 
         decoded_data = base64.b64decode(data.encode()).decode()
         return jsonify({"decrypted_data": decoded_data})
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+@app.route("/hash-generator", methods=["POST"])
+def hash_generator():
+    data = request.json.get("data")
+    algorithm = request.json.get("algorithm", "sha256")
+    if not data:
+        return jsonify({"error": "The 'data' field is required in the request body."}), 400
+    try:
+        hash_func = getattr(hashlib, algorithm)
+    except AttributeError:
+        return jsonify({"error": f"Unsupported algorithm: {algorithm}"}), 400
+    hashed = hash_func(data.encode()).hexdigest()
+    return jsonify({"algorithm": algorithm, "hash": hashed})
+
+@app.route("/uuid-generator", methods=["GET"])
+def uuid_generator():
+    return jsonify({"uuid": str(uuid.uuid4())})
+
+@app.route("/currency-converter")
+def currency_converter():
+    from requests import get
+    base = request.args.get("base")
+    target = request.args.get("target")
+    amount = request.args.get("amount")
+    if not base or not target or not amount:
+        return jsonify({"error": "Parameters 'base', 'target', and 'amount' are required."}), 400
+    try:
+        amount = float(amount)
+    except ValueError:
+        return jsonify({"error": "'amount' must be a valid number."}), 400
+    try:
+        # Using exchangerate.host free API
+        url = f"https://api.exchangerate.host/convert?from={base.upper()}&to={target.upper()}&amount={amount}"
+        resp = get(url)
+        if resp.status_code != 200:
+            return jsonify({"error": "Failed to fetch exchange rate."}), 500
+        data = resp.json()
+        if not data.get("success", True):
+            return jsonify({"error": "Currency conversion failed."}), 400
+        return jsonify({
+            "base": base.upper(),
+            "target": target.upper(),
+            "amount": amount,
+            "converted": data["result"],
+            "rate": data["info"]["rate"]
+        })
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500

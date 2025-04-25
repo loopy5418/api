@@ -359,20 +359,19 @@ def qr_code():
 def emojify():
     text = request.args.get("text")
     if not text:
-        return jsonify({"error": "Missing 'text' query parameter.", "success": False}), 400
+        return jsonify({"error": "Missing 'text' query parameter."}), 400
     def to_emoji(c):
         if c.isalpha():
-            base = ord('🇦')
-            return chr(base + ord(c.lower()) - ord('a'))
+            return f":regional_indicator_{c.lower()}:"
         elif c.isdigit():
-            nums = ["0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣"]
-            return nums[int(c)]
+            nums = ["zero","one","two","three","four","five","six","seven","eight","nine"]
+            return f":{nums[int(c)]}:"
         elif c == ' ':
             return '   '
         else:
             return c
     result = ' '.join(to_emoji(c) for c in text)
-    return jsonify({"result": result, "success": True})
+    return jsonify({"result": result})
 
 @app.route("/owoify")
 def owoify():

@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, request, render_template, abort
+from flask import Flask, Response, jsonify, request, render_template, abort, redirect
 import psutil
 import platform
 import time
@@ -254,3 +254,8 @@ def currency_converter():
         })
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}", "success": False}), 500
+
+@app.route("/support")
+def support_redirect():
+    discord_invite = os.environ.get("DISCORD_INVITE", "#")
+    return redirect(discord_invite)

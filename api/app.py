@@ -169,9 +169,9 @@ def restart_dyno():
     code, data = restart_heroku_dyno()
 
     if code == 202:
-        return jsonify({"message": "Heroku dyno restart triggered!"}), 202
+        return jsonify({"message": "Heroku dyno restart triggered!", "success": True}), 202
     else:
-        return jsonify({"error": "Failed to restart dyno", "response": data}), 500
+        return jsonify({"success": False, "error": "Failed to restart dyno", "response": data}), 500
 
 @app.route("/base64-encrypt", methods=["POST"])
 def base64_encrypt():

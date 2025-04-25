@@ -25,7 +25,12 @@
 <body class="bg-black text-white">
   <header class="bg-yellow-500 text-black py-4 shadow-md flex items-center justify-between px-6">
     <h1 class="text-2xl font-bold">Admin API</h1>
-    <button onclick="redirectToIndex()" class="bg-black text-yellow-400 font-semibold px-4 py-1.5 rounded-lg text-sm hover:bg-gray-800">Back to index</button>
+    <div class="space-x-2 flex items-center">
+      <button onclick="window.open('https://discord.gg/your-invite', '_blank')" class="bg-yellow-100 hover:bg-yellow-200 rounded-lg p-1.5 flex items-center justify-center" title="Join Discord">
+        <img src="/static/discord-white-icon.png" alt="Discord" class="h-5 w-5" style="filter: invert(67%) sepia(99%) saturate(749%) hue-rotate(2deg) brightness(97%) contrast(101%);">
+      </button>
+      <button onclick="redirectToIndex()" class="bg-black text-yellow-400 font-semibold px-4 py-1.5 rounded-lg text-sm hover:bg-gray-800">Back to index</button>
+    </div>
   </header>
 
   <main class="p-6">

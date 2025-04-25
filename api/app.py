@@ -12,6 +12,7 @@ import base64
 import uuid
 import hashlib
 
+
 start_time = time.time()
 
 def format_duration(seconds):
@@ -19,7 +20,7 @@ def format_duration(seconds):
     minutes, seconds = divmod(remainder, 60)
     return f"{hours:02}:{minutes:02}:{seconds:02}"
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="templates/static")
 app.register_blueprint(errors)
 
 def restart_heroku_dyno():

@@ -270,7 +270,7 @@ def image_with_text():
     position = data.get("position", (10, 10))
     color = data.get("color", "#FFFFFF")
     font_size = data.get("font_size", 32)
-    font_style = data.get("font_style", "normal").lower()  # new option
+    font_style = data.get("font_style", "normal").lower()
 
     if not image_url or not text:
         return jsonify({"error": "'image_url' and 'text' are required fields.", "success": False}), 400
@@ -288,17 +288,17 @@ def image_with_text():
             # Try to use a font that supports different sizes
             font_path_base = os.path.join(os.path.dirname(__file__), "templates", "static")
             font_files = {
-                "normal": "arial.ttf",
-                "bold": "arialbd.ttf",
-                "italic": "ariali.ttf",
-                "bold-italic": "arialbi.ttf"
+                "normal": "Roboto-Regular.ttf",
+                "bold": "Roboto-Bold.ttf",
+                "italic": "Roboto-Italic.ttf",
+                "bold-italic": "Roboto-BoldItalic.ttf"
             }
-            font_file = font_files.get(font_style, "arial.ttf")
+            font_file = font_files.get(font_style, "Roboto-Regular.ttf")
             font_path = os.path.join(font_path_base, font_file)
             if os.path.exists(font_path):
                 font = ImageFont.truetype(font_path, font_size)
             else:
-                font = ImageFont.truetype(font_file, font_size)
+                font = ImageFont.truetype("arial.ttf", font_size)
         except Exception:
             font = ImageFont.load_default()
         width, height = image.size

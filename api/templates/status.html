@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Status - api.loopy5418.dev</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .status-icon {
+      font-size: 3rem;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-2xl mt-10">
+    <h1 class="text-3xl font-bold mb-6 text-blue-700 text-center">API Status</h1>
+    <div id="health-status" class="flex items-center justify-center mb-6">
+      <span id="health-icon" class="status-icon mr-2">⏳</span>
+      <span id="health-text" class="text-xl font-semibold">Checking...</span>
+    </div>
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="text-gray-500 text-sm">CPU Usage</div>
+        <canvas id="cpuChart" height="80"></canvas>
+        <div class="text-lg font-bold mt-2"><span id="cpu_usage_percent">-</span>%</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="text-gray-500 text-sm">RAM Usage</div>
+        <canvas id="ramChart" height="80"></canvas>
+        <div class="text-lg font-bold mt-2"><span id="ram_used_percent">-</span>%</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="text-gray-500 text-sm">Disk Usage</div>
+        <canvas id="diskChart" height="80"></canvas>
+        <div class="text-lg font-bold mt-2"><span id="disk_used_percent">-</span>%</div>
+      </div>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <div class="text-gray-500 text-sm">Uptime</div>
+        <div class="text-lg font-bold mt-6"><span id="uptime">-</span></div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <div class="text-gray-500 text-sm">Platform</div>
+        <div class="font-mono" id="platform">-</div>
+      </div>
+      <div>
+        <div class="text-gray-500 text-sm">Python Version</div>
+        <div class="font-mono" id="python_version">-</div>
+      </div>
+    </div>
+    <div id="error-message" class="text-red-600 text-center mt-4 hidden"></div>
+  </div>
+  <script>
+    let cpuData = [];
+    let ramData = [];
+    let diskData = [];
+    const maxPoints = 20;
+    let cpuChart, ramChart, diskChart;
+
+    function formatUptime(seconds) {
+      const d = Math.floor(seconds / 86400);
+      const h = Math.floor((seconds % 86400) / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = seconds % 60;
+      return `${d}d ${h}h ${m}m ${s}s`;
+    }
+
+    function updateCharts(cpu, ram, disk) {
+      cpuData.push(cpu);
+      ramData.push(ram);
+      diskData.push(disk);
+      if (cpuData.length > maxPoints) cpuData.shift();
+      if (ramData.length > maxPoints) ramData.shift();
+      if (diskData.length > maxPoints) diskData.shift();
+      cpuChart.data.datasets[0].data = cpuData;
+      ramChart.data.datasets[0].data = ramData;
+      diskChart.data.datasets[0].data = diskData;
+      cpuChart.update();
+      ramChart.update();
+      diskChart.update();
+    }
+
+    function setHealth(ok) {
+      const icon = document.getElementById('health-icon');
+      const text = document.getElementById('health-text');
+      if (ok) {
+        icon.textContent = '✅';
+        icon.classList.remove('text-red-500');
+        icon.classList.add('text-green-500');
+        text.textContent = 'API is Healthy';
+        text.classList.remove('text-red-600');
+        text.classList.add('text-green-700');
+      } else {
+        icon.textContent = '❌';
+        icon.classList.remove('text-green-500');
+        icon.classList.add('text-red-500');
+        text.textContent = 'API is Down!';
+        text.classList.remove('text-green-700');
+        text.classList.add('text-red-600');
+      }
+    }
+
+    async function fetchStatus() {
+      let healthOK = false;
+      try {
+        const health = await fetch('https://api.loopy5418.dev/health');
+        healthOK = health.ok && (await health.text()).trim() === 'OK';
+        setHealth(healthOK);
+      } catch {
+        setHealth(false);
+      }
+      try {
+        const res = await fetch('https://api.loopy5418.dev/sysinfo');
+        if (!res.ok) throw new Error('sysinfo failed');
+        const data = await res.json();
+        document.getElementById('cpu_usage_percent').textContent = data.cpu_usage_percent;
+        document.getElementById('ram_used_percent').textContent = data.ram_used_percent;
+        document.getElementById('disk_used_percent').textContent = data.disk_used_percent;
+        document.getElementById('uptime').textContent = formatUptime(data.uptime_seconds);
+        document.getElementById('platform').textContent = data.platform + ' ' + data.platform_release;
+        document.getElementById('python_version').textContent = data.python_version;
+        updateCharts(data.cpu_usage_percent, data.ram_used_percent, data.disk_used_percent);
+        document.getElementById('error-message').classList.add('hidden');
+      } catch (e) {
+        document.getElementById('error-message').textContent = 'Failed to fetch system info.';
+        document.getElementById('error-message').classList.remove('hidden');
+      }
+    }
+
+    window.onload = function() {
+      const chartOptions = {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { min: 0, max: 100 } }
+      };
+      cpuChart = new Chart(document.getElementById('cpuChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: Array(maxPoints).fill(''), datasets: [{ label: 'CPU %', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.3 }] },
+        options: chartOptions
+      });
+      ramChart = new Chart(document.getElementById('ramChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: Array(maxPoints).fill(''), datasets: [{ label: 'RAM %', data: [], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.3 }] },
+        options: chartOptions
+      });
+      diskChart = new Chart(document.getElementById('diskChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: Array(maxPoints).fill(''), datasets: [{ label: 'Disk %', data: [], borderColor: '#f59e42', backgroundColor: 'rgba(245,158,66,0.1)', tension: 0.3 }] },
+        options: chartOptions
+      });
+      fetchStatus();
+      setInterval(fetchStatus, 5000);
+    };
+  </script>
+</body>
+</html>

@@ -15,6 +15,7 @@ import io
 from PIL import Image, ImageDraw, ImageFont
 from flask_cors import CORS
 from googletrans import Translator
+import logging
 
 start_time = time.time()
 
@@ -41,6 +42,20 @@ def restart_heroku_dyno():
 
     response = requests.delete(url, headers=headers)
     return response.status_code, response.json() if response.content else {}
+
+class IgnoreSysinfoFilter(logging.Filter):
+    def filter(self, record):
+        # Only log if the path is not /sysinfo or /health
+        try:
+            from flask import request
+            path = request.path
+            return path not in ["/sysinfo", "/health"]
+        except RuntimeError:
+            # Not in a request context
+            return True
+
+for handler in app.logger.handlers:
+    handler.addFilter(IgnoreSysinfoFilter())
 
 @app.route("/")
 def index():
@@ -575,3 +590,7 @@ def webhook_send():
             return jsonify({"error": f"Webhook send failed: {resp.text}", "success": False}), 500
     except Exception as e:
         return jsonify({"error": f"Request failed: {str(e)}", "success": False}), 500
+
+@app.route("status")
+def status():
+    render_template("status.html")

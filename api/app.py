@@ -443,6 +443,7 @@ def translate_text():
     target_lang = request.args.get("to")
     if not prompt or not target_lang:
         return jsonify({"error": "Missing 'text' or 'to' query parameter.", "success": False}), 400
+    from googletrans import Translator
     translator = Translator()
     try:
         translated = translator.translate(prompt, dest=target_lang)

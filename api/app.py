@@ -593,4 +593,4 @@ def webhook_send():
 
 @app.route("/status")
 def status():
-    render_template("status.html")
+    return render_template("status.html")

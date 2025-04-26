@@ -439,17 +439,7 @@ def choose():
 
 @app.route("/translate")
 def translate_text():
-    prompt = request.args.get("text")
-    target_lang = request.args.get("to")
-    if not prompt or not target_lang:
-        return jsonify({"error": "Missing 'text' or 'to' query parameter.", "success": False}), 400
-    from googletrans import Translator
-    translator = Translator()
-    try:
-        translated = translator.translate(prompt, dest=target_lang)
-        return jsonify({"translation": translated.text, "success": True})
-    except Exception as e:
-        return jsonify({"error": f"Translation failed: {str(e)}", "success": False}), 500
+    return jsonify({"error": "This endpoint is temporarily disabled.", "success": False}), 500
 
 @app.route("/webhook-send", methods=["POST"])
 def webhook_send():

@@ -591,6 +591,6 @@ def webhook_send():
     except Exception as e:
         return jsonify({"error": f"Request failed: {str(e)}", "success": False}), 500
 
-@app.route("status")
+@app.route("/status")
 def status():
     render_template("status.html")

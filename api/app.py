@@ -445,7 +445,7 @@ def translate_text():
         return jsonify({"error": "Missing 'text' or 'to' query parameter.", "success": False}), 400
     translator = Translator()
     try:
-        translated = translator.translate(prompt, dest=target_lang)
+        translated = await translator.translate(prompt, dest=target_lang)
         return jsonify({"translation": translated.text, "success": True})
     except Exception as e:
         return jsonify({"error": f"Translation failed: {str(e)}", "success": False}), 500

@@ -5,4 +5,4 @@ requests
 Pillow
 flask-cors
 qrcode[pil]
-googletrans==4.0.0-rc1
+googletrans

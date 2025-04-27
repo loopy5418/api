@@ -14,7 +14,6 @@ import hashlib
 import io
 from PIL import Image, ImageDraw, ImageFont
 from flask_cors import CORS
-from googletrans import Translator
 import logging
 
 start_time = time.time()

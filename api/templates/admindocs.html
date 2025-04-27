@@ -75,6 +75,33 @@
 }</code></pre>
         </div>
       </div>
+
+      <div class="mb-4 p-4 rounded-xl bg-gray-800 shadow cursor-pointer" onclick="toggleDetails('evaluate')">
+        <span class="bg-yellow-300 text-orange-800 text-xs font-bold mr-2 px-2.5 py-0.5 rounded">POST</span>        <span class="ml-2 font-mono text-white">/evaluate</span>
+      </div>
+      <div id="evaluate" class="hidden bg-gray-900 p-4 rounded-xl mb-4">
+        <h3 class="text-lg font-semibold mb-2">Details</h3>
+        <p class="mb-2 text-gray-400">This endpoint runs a command in the worker dyno.</p>
+        <div class="mb-2">
+          <h4 class="font-semibold">Headers:</h4>
+          <ul class="list-disc list-inside text-gray-300">
+            <li><span class="font-mono">X-API-KEY</span>: string (your api key, required)</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold mb-1">Example Request Body:</h4>
+          <pre><code class="language-json">{
+  "cmd": "pip --version"
+}</code></pre>
+          <h4 class="font-semibold mb-1">Example Response:</h4>
+          <pre><code class="language-json">{
+  "stdout": "pip 24.0 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)\n",
+  "stderr": "",
+  "returncode": 0,
+  "success": true
+}</code></pre>
+        </div>
+      </div>
   </main>
 </body>
 </html>

@@ -447,31 +447,7 @@
 
       
 
-      <!-- GET /translate -->
-      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-translate')">
-          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
-          <span class="flex-1 ml-2 text-lg">/translate</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-        <div id="endpoint-translate" class="px-6 py-4 hidden border-t dark:border-gray-700">
-          <h3 class="font-semibold">Query Parameters</h3>
-          <ul class="list-disc pl-6 text-sm mb-4">
-            <li><strong>text</strong>: The text to translate (required)</li>
-            <li><strong>to</strong>: The target language code (e.g., en, tr, de) (required)</li>
-            <li><strong>from</strong>: The source language code (optional, default: auto)</li>
-          </ul>
-          <h3 class="font-semibold">Example URL</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/translate?text=hello&to=tr</p>
-          <h3 class="font-semibold">Response Preview</h3>
-          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
-  "translated": "merhaba",
-  "success": true
-}</code></pre>
-        </div>
-      </div>
+      
 
       <!-- POST /webhook-send -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">

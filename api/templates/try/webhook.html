@@ -302,12 +302,16 @@
       });
 
       const payload = {
-        url,
-        content,
-        username,
-        avatar_url,
-        embeds: embeds.filter(e => Object.keys(e).length)
-      };
+  url,
+  content,
+  username,
+  avatar_url
+};
+
+const cleanedEmbeds = embeds.filter(e => Object.keys(e).length);
+if (cleanedEmbeds.length) {
+  payload.embeds = cleanedEmbeds;
+}
 
       document.getElementById('send-status').textContent = '';
       try {
@@ -343,7 +347,7 @@
     </div>
   </header>
   <!-- Main Content -->
-  <main class="max-w-6xl mx-auto flex flex-row gap-4 px-4">
+<main class="max-w-6xl mx-auto flex flex-col md:flex-row gap-4 px-4">
     <section class="md:w-1/2 rounded-xl p-6">
       <h2 class="text-xl font-semibold mb-4">Send a Discord Webhook</h2>
       <div class="mb-3">

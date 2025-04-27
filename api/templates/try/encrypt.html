@@ -5,6 +5,49 @@
   <title>Base64 Encode/Decode - API Playground</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .border-light {
+      border: 1.5px solid #474a51 !important;
+    }
+    .border-light-inner {
+      border: 1px solid #474a51 !important;
+    }
+    .rounded-lg {
+      border-radius: 0.75rem !important;
+    }
+    .rounded-xl {
+      border-radius: 1rem !important;
+    }
+    body, .bg-main {
+      background: #181c20 !important;
+    }
+    .text-main {
+      color: #e5e7eb !important;
+    }
+    .input-main, textarea, input[type="text"], input[type="number"] {
+      background: #23272e !important;
+      color: #e5e7eb !important;
+      border: 1px solid #474a51 !important;
+    }
+    .input-main:focus, textarea:focus {
+      outline: 2px solid #3b82f6;
+      background: #23272e;
+    }
+    .bg-blue-700 { background: #2563eb !important; }
+    .bg-blue-800 { background: #1e40af !important; }
+    .bg-green-700 { background: #047857 !important; }
+    .bg-yellow-500 { background: #eab308 !important; }
+    .bg-yellow-600 { background: #ca8a04 !important; }
+    .bg-gray-600 { background: #374151 !important; }
+    .bg-gray-700 { background: #23272e !important; }
+    .bg-gray-800 { background: #181c20 !important; }
+    .bg-gray-900 { background: #181c20 !important; }
+    .text-white { color: #f3f4f6 !important; }
+    .text-black { color: #181c20 !important; }
+    .text-green-400 { color: #4ade80 !important; }
+    .text-red-400 { color: #f87171 !important; }
+    .shadow-md, .shadow, .shadow-lg { box-shadow: none !important; }
+  </style>
   <script>
     async function base64Encrypt() {
       const data = document.getElementById('b64-input').value;
@@ -75,31 +118,31 @@
     }
   </script>
 </head>
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
+<body class="bg-main text-main min-h-screen">
   <!-- Header with title and return button only -->
-  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 bg-white dark:bg-gray-800 shadow">
+  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 shadow bg-main">
     <div class="flex items-center space-x-4">
       <span class="text-2xl font-bold tracking-tight">Loopy API Playground</span>
-      <span class="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded">v1</span>
+      <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">v1</span>
     </div>
     <div class="mt-4 md:mt-0 ml-0 md:ml-6">
-      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded transition" title="Return to index">← Return to Index</a>
+      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-2 rounded transition" title="Return to index">← Return to Index</a>
     </div>
   </header>
   <!-- Main Content -->
-  <main class="max-w-2xl mx-auto mt-8 flex flex-col gap-8 px-4">
-    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+  <main class="max-w-2xl mx-auto flex flex-col gap-8 px-4">
+    <section class="rounded-xl p-6 border-light">
       <h2 class="text-xl font-semibold mb-4">Base64 Encode / Decode</h2>
       <div class="mb-3">
-        <textarea id="b64-input" rows="6" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white resize-y" placeholder="Enter text or base64 here"></textarea>
+        <textarea id="b64-input" rows="6" class="input-main block w-full mb-2 p-2 rounded-lg resize-y" placeholder="Enter text or base64 here"></textarea>
       </div>
       <div class="flex gap-2 mb-3">
-        <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded" onclick="base64Encrypt()">Encode</button>
-        <button class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded" onclick="base64Decrypt()">Decode</button>
-        <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded" onclick="clearFields()">Clear</button>
+        <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-lg" onclick="base64Encrypt()">Encode</button>
+        <button class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg" onclick="base64Decrypt()">Decode</button>
+        <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg" onclick="clearFields()">Clear</button>
       </div>
       <div>
-        <textarea id="b64-output" rows="6" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white resize-y" placeholder="Result will appear here" readonly></textarea>
+        <textarea id="b64-output" rows="6" class="input-main block w-full mb-2 p-2 rounded-lg resize-y" placeholder="Result will appear here" readonly></textarea>
       </div>
       <div id="b64-status" class="mt-2"></div>
     </section>

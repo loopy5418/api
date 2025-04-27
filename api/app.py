@@ -611,16 +611,15 @@ def try_webhook():
 
 
 @app.route("/try/qr")
-def try_webhook():
+def try_qr():
     return render_template("try/qr.html")
 
-
 @app.route("/try/encrypt")
-def try_webhook():
+def try_encrypt():
     return render_template("try/encrypt.html")
 
 
 @app.route("/try/image")
-def try_webhook():
+def try_image():
     return render_template("try/image.html")
 

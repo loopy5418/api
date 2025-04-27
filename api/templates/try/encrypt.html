@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors">
+<head>
+  <meta charset="UTF-8">
+  <title>Base64 Encode/Decode - API Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    async function base64Encrypt() {
+      const data = document.getElementById('b64-input').value;
+      const out = document.getElementById('b64-output');
+      if (!data.trim()) {
+        out.value = '';
+        document.getElementById('b64-status').textContent = "❌ Input required.";
+        document.getElementById('b64-status').className = "text-red-400 mt-2";
+        return;
+      }
+      try {
+        const resp = await fetch("https://api.loopy5418.dev/base64-encrypt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data })
+        });
+        const json = await resp.json();
+        if (json.success) {
+          out.value = json.encrypted_data;
+          document.getElementById('b64-status').textContent = "✅ Encoded!";
+          document.getElementById('b64-status').className = "text-green-400 mt-2";
+        } else {
+          out.value = '';
+          document.getElementById('b64-status').textContent = "❌ " + (json.error || "Error");
+          document.getElementById('b64-status').className = "text-red-400 mt-2";
+        }
+      } catch (e) {
+        out.value = '';
+        document.getElementById('b64-status').textContent = "❌ Network error.";
+        document.getElementById('b64-status').className = "text-red-400 mt-2";
+      }
+    }
+    async function base64Decrypt() {
+      const data = document.getElementById('b64-input').value;
+      const out = document.getElementById('b64-output');
+      if (!data.trim()) {
+        out.value = '';
+        document.getElementById('b64-status').textContent = "❌ Input required.";
+        document.getElementById('b64-status').className = "text-red-400 mt-2";
+        return;
+      }
+      try {
+        const resp = await fetch("https://api.loopy5418.dev/base64-decrypt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data })
+        });
+        const json = await resp.json();
+        if (json.success) {
+          out.value = json.decrypted_data;
+          document.getElementById('b64-status').textContent = "✅ Decoded!";
+          document.getElementById('b64-status').className = "text-green-400 mt-2";
+        } else {
+          out.value = '';
+          document.getElementById('b64-status').textContent = "❌ " + (json.error || "Error");
+          document.getElementById('b64-status').className = "text-red-400 mt-2";
+        }
+      } catch (e) {
+        out.value = '';
+        document.getElementById('b64-status').textContent = "❌ Network error.";
+        document.getElementById('b64-status').className = "text-red-400 mt-2";
+      }
+    }
+    function clearFields() {
+      document.getElementById('b64-input').value = '';
+      document.getElementById('b64-output').value = '';
+      document.getElementById('b64-status').textContent = '';
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
+  <!-- Header with title and return button only -->
+  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 bg-white dark:bg-gray-800 shadow">
+    <div class="flex items-center space-x-4">
+      <span class="text-2xl font-bold tracking-tight">Loopy API Playground</span>
+      <span class="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded">v1</span>
+    </div>
+    <div class="mt-4 md:mt-0 ml-0 md:ml-6">
+      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded transition" title="Return to index">← Return to Index</a>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <main class="max-w-2xl mx-auto mt-8 flex flex-col gap-8 px-4">
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Base64 Encode / Decode</h2>
+      <div class="mb-3">
+        <textarea id="b64-input" rows="6" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white resize-y" placeholder="Enter text or base64 here"></textarea>
+      </div>
+      <div class="flex gap-2 mb-3">
+        <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded" onclick="base64Encrypt()">Encode</button>
+        <button class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded" onclick="base64Decrypt()">Decode</button>
+        <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded" onclick="clearFields()">Clear</button>
+      </div>
+      <div>
+        <textarea id="b64-output" rows="6" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white resize-y" placeholder="Result will appear here" readonly></textarea>
+      </div>
+      <div id="b64-status" class="mt-2"></div>
+    </section>
+  </main>
+</body>
+</html>

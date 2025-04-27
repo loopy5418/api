@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors">
+<head>
+  <meta charset="UTF-8">
+  <title>Image With Text - API Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    async function generateImageWithText() {
+      const image_url = document.getElementById('img-url').value.trim();
+      const text = document.getElementById('img-text').value;
+      const position = document.getElementById('img-position').value.trim();
+      const color = document.getElementById('img-color').value.trim();
+      const font_size = parseInt(document.getElementById('img-font-size').value, 10);
+      const font_style = document.getElementById('img-font-style').value;
+
+      const status = document.getElementById('img-status');
+      const preview = document.getElementById('img-preview');
+      preview.src = "";
+      status.textContent = "";
+
+      if (!image_url || !text) {
+        status.textContent = "❌ 'image_url' and 'text' are required.";
+        status.className = "text-red-400 mt-2";
+        return;
+      }
+
+      status.textContent = "⏳ Generating...";
+      status.className = "text-yellow-400 mt-2";
+
+      try {
+        const resp = await fetch("https://api.loopy5418.dev/image-with-text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image_url,
+            text,
+            position: position || undefined,
+            color: color || undefined,
+            font_size: isNaN(font_size) ? undefined : font_size,
+            font_style: font_style || undefined
+          })
+        });
+
+        if (resp.ok && resp.headers.get("content-type").startsWith("image/")) {
+          const blob = await resp.blob();
+          preview.src = URL.createObjectURL(blob);
+          preview.classList.remove("hidden");
+          status.textContent = "✅ Success!";
+          status.className = "text-green-400 mt-2";
+        } else {
+          const data = await resp.json();
+          status.textContent = "❌ " + (data.error || "Failed to generate image.");
+          status.className = "text-red-400 mt-2";
+          preview.classList.add("hidden");
+        }
+      } catch (e) {
+        status.textContent = "❌ Network error.";
+        status.className = "text-red-400 mt-2";
+        preview.classList.add("hidden");
+      }
+    }
+
+    function clearFields() {
+      document.getElementById('img-url').value = '';
+      document.getElementById('img-text').value = '';
+      document.getElementById('img-position').value = '';
+      document.getElementById('img-color').value = '#FFFFFF';
+      document.getElementById('img-font-size').value = 32;
+      document.getElementById('img-font-style').value = 'normal';
+      document.getElementById('img-status').textContent = '';
+      document.getElementById('img-preview').src = '';
+      document.getElementById('img-preview').classList.add('hidden');
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
+  <!-- Header with title and return button only -->
+  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 bg-white dark:bg-gray-800 shadow">
+    <div class="flex items-center space-x-4">
+      <span class="text-2xl font-bold tracking-tight">Loopy API Playground</span>
+      <span class="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded">v1</span>
+    </div>
+    <div class="mt-4 md:mt-0 ml-0 md:ml-6">
+      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded transition" title="Return to index">← Return to Index</a>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto mt-8 flex flex-col md:flex-row gap-8 px-4">
+    <!-- Left: Form -->
+    <section class="md:w-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Overlay Text on an Image</h2>
+      <div class="mb-3">
+        <input id="img-url" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Image URL (required)">
+        <textarea id="img-text" rows="3" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white resize-y" placeholder="Text to overlay (required)"></textarea>
+        <input id="img-position" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Position (e.g. top, center, bottom, or x,y)">
+        <div class="flex gap-2 mb-2">
+          <input id="img-color" type="color" class="w-10 h-10 p-1 rounded" value="#FFFFFF" title="Text Color">
+          <input id="img-font-size" type="number" min="8" max="256" class="w-24 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white" value="32" placeholder="Font Size">
+          <select id="img-font-style" class="p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white">
+            <option value="normal">Normal</option>
+            <option value="bold">Bold</option>
+            <option value="italic">Italic</option>
+            <option value="bold-italic">Bold Italic</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded" onclick="generateImageWithText()">Generate</button>
+        <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded" onclick="clearFields()">Clear</button>
+      </div>
+      <div id="img-status" class="mt-2"></div>
+    </section>
+    <!-- Right: Preview -->
+    <section class="md:w-1/2 bg-gray-900 rounded-xl shadow-md p-6 flex flex-col items-center justify-center">
+      <h2 class="text-xl font-semibold mb-4 text-white">Preview</h2>
+      <img id="img-preview" class="bg-white rounded p-4 shadow-lg max-w-xs max-h-xs hidden" alt="Image With Text Preview">
+    </section>
+  </main>
+</body>
+</html>

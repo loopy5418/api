@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Generator - API Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    function updatePreview() {
+      const data = document.getElementById('qr-data').value;
+      const preview = document.getElementById('qr-preview');
+      if (data.trim() !== "") {
+        preview.src = `https://api.loopy5418.dev/qr?data=${encodeURIComponent(data)}`;
+        preview.classList.remove('hidden');
+      } else {
+        preview.src = "";
+        preview.classList.add('hidden');
+      }
+    }
+    function clearQR() {
+      document.getElementById('qr-data').value = "";
+      updatePreview();
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
+  <!-- Header with title and return button only -->
+  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 bg-white dark:bg-gray-800 shadow">
+    <div class="flex items-center space-x-4">
+      <span class="text-2xl font-bold tracking-tight">Loopy API Playground</span>
+      <span class="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded">v1</span>
+    </div>
+    <div class="mt-4 md:mt-0 ml-0 md:ml-6">
+      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded transition" title="Return to index">← Return to Index</a>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto mt-8 flex flex-col md:flex-row gap-8 px-4">
+    <!-- Left: Form -->
+    <section class="md:w-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Generate a QR Code</h2>
+      <div class="mb-3">
+        <textarea id="qr-data" rows="7" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white resize-y" placeholder="Data to encode (required)" oninput="updatePreview()"></textarea>
+      </div>
+      <div class="flex gap-2">
+        <button class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded" onclick="updatePreview()">Generate</button>
+        <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded" onclick="clearQR()">Clear</button>
+      </div>
+      <div id="send-status" class="mt-2"></div>
+    </section>
+    <!-- Right: Preview -->
+    <section class="md:w-1/2 bg-gray-900 rounded-xl shadow-md p-6 flex flex-col items-center justify-center">
+      <h2 class="text-xl font-semibold mb-4 text-white">Preview</h2>
+      <img id="qr-preview" class="bg-white rounded p-4 shadow-lg max-w-xs max-h-xs hidden" alt="QR Code Preview">
+    </section>
+  </main>
+  <script>
+    // Autofocus and preview on load
+    window.onload = function() {
+      document.getElementById('qr-data').focus();
+      updatePreview();
+    };
+  </script>
+</body>
+</html>

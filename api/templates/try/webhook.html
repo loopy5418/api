@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors">
+<head>
+  <meta charset="UTF-8">
+  <title>Webhook Sender - API Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    // Helper to update preview
+    function updatePreview() {
+      const content = document.getElementById('content').value;
+      const username = document.getElementById('username').value;
+      const avatar_url = document.getElementById('avatar_url').value;
+      const embeds = [];
+      document.querySelectorAll('.embed-block').forEach(embedBlock => {
+        const embed = {};
+        // Simple fields
+        embed.title = embedBlock.querySelector('.embed-title').value;
+        embed.description = embedBlock.querySelector('.embed-description').value;
+        embed.url = embedBlock.querySelector('.embed-url').value;
+        embed.color = embedBlock.querySelector('.embed-color').value ? parseInt(embedBlock.querySelector('.embed-color').value) : undefined;
+
+        // Author
+        if (embedBlock.querySelector('.toggle-author').checked) {
+          const author = {};
+          author.name = embedBlock.querySelector('.author-name').value;
+          author.url = embedBlock.querySelector('.author-url').value;
+          author.icon_url = embedBlock.querySelector('.author-icon_url').value;
+          // Only include if at least one field is filled
+          if (author.name || author.url || author.icon_url) embed.author = author;
+        }
+
+        // Footer
+        if (embedBlock.querySelector('.toggle-footer').checked) {
+          const footer = {};
+          footer.text = embedBlock.querySelector('.footer-text').value;
+          footer.icon_url = embedBlock.querySelector('.footer-icon_url').value;
+          if (footer.text || footer.icon_url) embed.footer = footer;
+        }
+
+        // Image
+        if (embedBlock.querySelector('.toggle-image').checked) {
+          const image_url = embedBlock.querySelector('.image-url').value;
+          if (image_url) embed.image = { url: image_url };
+        }
+
+        // Thumbnail
+        if (embedBlock.querySelector('.toggle-thumbnail').checked) {
+          const thumb_url = embedBlock.querySelector('.thumbnail-url').value;
+          if (thumb_url) embed.thumbnail = { url: thumb_url };
+        }
+
+        // Fields
+        const fields = [];
+        embedBlock.querySelectorAll('.embed-field').forEach(fieldBlock => {
+          const name = fieldBlock.querySelector('.field-name').value;
+          const value = fieldBlock.querySelector('.field-value').value;
+          const inline = fieldBlock.querySelector('.field-inline').checked;
+          if (name && value) fields.push({ name, value, inline });
+        });
+        if (fields.length) embed.fields = fields;
+
+        // Remove empty string fields and undefined
+        Object.keys(embed).forEach(k => {
+          if (embed[k] === "" || embed[k] === undefined) delete embed[k];
+        });
+
+        // Only push if at least one property
+        if (Object.keys(embed).length) embeds.push(embed);
+      });
+      document.getElementById('preview').textContent = JSON.stringify({
+        content, username, avatar_url, embeds
+      }, null, 2);
+    }
+
+    function addEmbed() {
+      const embedList = document.getElementById('embeds');
+      const embedIdx = embedList.children.length;
+      const embedBlock = document.createElement('div');
+      embedBlock.className = "embed-block bg-gray-800 p-4 rounded mb-4";
+      embedBlock.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-bold text-gray-200">Embed #${embedIdx + 1}</span>
+          <button type="button" class="text-red-400 hover:text-red-600" onclick="this.closest('.embed-block').remove(); updatePreview();">Remove</button>
+        </div>
+        <input class="embed-title block w-full mb-2 p-2 rounded bg-gray-700 text-white" placeholder="Title (optional)" oninput="updatePreview()">
+        <textarea class="embed-description block w-full mb-2 p-2 rounded bg-gray-700 text-white" placeholder="Description (optional)" oninput="updatePreview()"></textarea>
+        <input class="embed-url block w-full mb-2 p-2 rounded bg-gray-700 text-white" placeholder="URL (optional)" oninput="updatePreview()">
+        <input class="embed-color block w-full mb-2 p-2 rounded bg-gray-700 text-white" placeholder="Color (int, optional)" type="number" oninput="updatePreview()">
+
+        <div class="flex items-center mb-2">
+          <input type="checkbox" class="toggle-author mr-2" id="toggle-author-${embedIdx}" onchange="this.parentElement.nextElementSibling.classList.toggle('hidden', !this.checked); updatePreview();">
+          <label for="toggle-author-${embedIdx}" class="text-gray-300 cursor-pointer">Author</label>
+        </div>
+        <div class="author-section hidden mb-2">
+          <input class="author-name block w-full mb-1 p-2 rounded bg-gray-700 text-white" placeholder="Author Name (optional)" oninput="updatePreview()">
+          <input class="author-url block w-full mb-1 p-2 rounded bg-gray-700 text-white" placeholder="Author URL (optional)" oninput="updatePreview()">
+          <input class="author-icon_url block w-full mb-1 p-2 rounded bg-gray-700 text-white" placeholder="Author Icon URL (optional)" oninput="updatePreview()">
+        </div>
+
+        <div class="flex items-center mb-2">
+          <input type="checkbox" class="toggle-footer mr-2" id="toggle-footer-${embedIdx}" onchange="this.parentElement.nextElementSibling.classList.toggle('hidden', !this.checked); updatePreview();">
+          <label for="toggle-footer-${embedIdx}" class="text-gray-300 cursor-pointer">Footer</label>
+        </div>
+        <div class="footer-section hidden mb-2">
+          <input class="footer-text block w-full mb-1 p-2 rounded bg-gray-700 text-white" placeholder="Footer Text (optional)" oninput="updatePreview()">
+          <input class="footer-icon_url block w-full mb-1 p-2 rounded bg-gray-700 text-white" placeholder="Footer Icon URL (optional)" oninput="updatePreview()">
+        </div>
+
+        <div class="flex items-center mb-2">
+          <input type="checkbox" class="toggle-image mr-2" id="toggle-image-${embedIdx}" onchange="this.parentElement.nextElementSibling.classList.toggle('hidden', !this.checked); updatePreview();">
+          <label for="toggle-image-${embedIdx}" class="text-gray-300 cursor-pointer">Image</label>
+        </div>
+        <div class="image-section hidden mb-2">
+          <input class="image-url block w-full mb-1 p-2 rounded bg-gray-700 text-white" placeholder="Image URL (optional)" oninput="updatePreview()">
+        </div>
+
+        <div class="flex items-center mb-2">
+          <input type="checkbox" class="toggle-thumbnail mr-2" id="toggle-thumbnail-${embedIdx}" onchange="this.parentElement.nextElementSibling.classList.toggle('hidden', !this.checked); updatePreview();">
+          <label for="toggle-thumbnail-${embedIdx}" class="text-gray-300 cursor-pointer">Thumbnail</label>
+        </div>
+        <div class="thumbnail-section hidden mb-2">
+          <input class="thumbnail-url block w-full mb-1 p-2 rounded bg-gray-700 text-white" placeholder="Thumbnail URL (optional)" oninput="updatePreview()">
+        </div>
+
+        <div class="fields-list"></div>
+        <button type="button" class="mt-2 bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded" onclick="addField(this);">Add Field</button>
+      `;
+      embedList.appendChild(embedBlock);
+      updatePreview();
+    }
+
+    function addField(btn) {
+      const fieldsList = btn.parentElement.querySelector('.fields-list');
+      const fieldBlock = document.createElement('div');
+      fieldBlock.className = "embed-field flex space-x-2 mb-2";
+      fieldBlock.innerHTML = `
+        <input class="field-name w-1/3 p-1 rounded bg-gray-700 text-white" placeholder="Field Name" oninput="updatePreview()">
+        <input class="field-value w-2/3 p-1 rounded bg-gray-700 text-white" placeholder="Field Value" oninput="updatePreview()">
+        <label class="flex items-center text-xs text-gray-300 ml-2">
+          <input type="checkbox" class="field-inline mr-1">Inline
+        </label>
+        <button type="button" class="text-red-400 hover:text-red-600 ml-2" onclick="this.parentElement.remove(); updatePreview();">✕</button>
+      `;
+      fieldsList.appendChild(fieldBlock);
+      updatePreview();
+    }
+
+    async function sendWebhook() {
+      updatePreview();
+      const content = document.getElementById('content').value;
+      const username = document.getElementById('username').value;
+      const avatar_url = document.getElementById('avatar_url').value;
+      const url = document.getElementById('webhook_url').value;
+      const embeds = [];
+      document.querySelectorAll('.embed-block').forEach(embedBlock => {
+        const embed = {};
+        embed.title = embedBlock.querySelector('.embed-title').value;
+        embed.description = embedBlock.querySelector('.embed-description').value;
+        embed.url = embedBlock.querySelector('.embed-url').value;
+        embed.color = embedBlock.querySelector('.embed-color').value ? parseInt(embedBlock.querySelector('.embed-color').value) : undefined;
+
+        // Author
+        if (embedBlock.querySelector('.toggle-author').checked) {
+          const author = {};
+          author.name = embedBlock.querySelector('.author-name').value;
+          author.url = embedBlock.querySelector('.author-url').value;
+          author.icon_url = embedBlock.querySelector('.author-icon_url').value;
+          if (author.name || author.url || author.icon_url) embed.author = author;
+        }
+
+        // Footer
+        if (embedBlock.querySelector('.toggle-footer').checked) {
+          const footer = {};
+          footer.text = embedBlock.querySelector('.footer-text').value;
+          footer.icon_url = embedBlock.querySelector('.footer-icon_url').value;
+          if (footer.text || footer.icon_url) embed.footer = footer;
+        }
+
+        // Image
+        if (embedBlock.querySelector('.toggle-image').checked) {
+          const image_url = embedBlock.querySelector('.image-url').value;
+          if (image_url) embed.image = { url: image_url };
+        }
+
+        // Thumbnail
+        if (embedBlock.querySelector('.toggle-thumbnail').checked) {
+          const thumb_url = embedBlock.querySelector('.thumbnail-url').value;
+          if (thumb_url) embed.thumbnail = { url: thumb_url };
+        }
+
+        // Fields
+        const fields = [];
+        embedBlock.querySelectorAll('.embed-field').forEach(fieldBlock => {
+          const name = fieldBlock.querySelector('.field-name').value;
+          const value = fieldBlock.querySelector('.field-value').value;
+          const inline = fieldBlock.querySelector('.field-inline').checked;
+          if (name && value) fields.push({ name, value, inline });
+        });
+        if (fields.length) embed.fields = fields;
+
+        // Remove empty string fields and undefined
+        Object.keys(embed).forEach(k => {
+          if (embed[k] === "" || embed[k] === undefined) delete embed[k];
+        });
+
+        if (Object.keys(embed).length) embeds.push(embed);
+      });
+
+      const payload = {
+        url,
+        content,
+        username,
+        avatar_url,
+        embeds: embeds.filter(e => Object.keys(e).length)
+      };
+
+      document.getElementById('send-status').textContent = '';
+      try {
+        const resp = await fetch('https://api.loopy5418.dev/webhook-send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        if (data.success) {
+          document.getElementById('send-status').textContent = '✅ Webhook sent!';
+          document.getElementById('send-status').className = 'text-green-400 mt-2';
+        } else {
+          document.getElementById('send-status').textContent = '❌ ' + (data.error || 'Failed to send webhook.');
+          document.getElementById('send-status').className = 'text-red-400 mt-2';
+        }
+      } catch (e) {
+        document.getElementById('send-status').textContent = '❌ Network error.';
+        document.getElementById('send-status').className = 'text-red-400 mt-2';
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
+  <!-- Header with title and buttons -->
+  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 bg-white dark:bg-gray-800 shadow">
+    <div class="flex items-center space-x-4">
+      <span class="text-2xl font-bold tracking-tight">Loopy API Playground</span>
+      <span class="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded">v1</span>
+    </div>
+    
+    <div class="mt-4 md:mt-0 ml-0 md:ml-6">
+      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded transition" title="Return to index">← Return to Index</a>
+    </div>
+  </header>
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto mt-8 flex flex-col md:flex-row gap-8 px-4">
+    <!-- Left: Form -->
+    <section class="md:w-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4">Send a Discord Webhook</h2>
+      <div class="mb-3">
+        <input id="webhook_url" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Webhook URL (required)" oninput="updatePreview()">
+        <input id="username" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Username (optional)" oninput="updatePreview()">
+        <input id="avatar_url" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Avatar URL (optional)" oninput="updatePreview()">
+        <textarea id="content" class="block w-full mb-2 p-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white" placeholder="Content (optional)" rows="2" oninput="updatePreview()"></textarea>
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-semibold text-gray-700 dark:text-gray-200">Embeds</span>
+          <button type="button" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded" onclick="addEmbed()">Add Embed</button>
+        </div>
+        <div id="embeds"></div>
+      </div>
+      <button class="mt-4 bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded" onclick="sendWebhook()">Send</button>
+      <div id="send-status" class="mt-2"></div>
+    </section>
+    <!-- Right: Preview -->
+    <section class="md:w-1/2 bg-gray-900 rounded-xl shadow-md p-6">
+      <h2 class="text-xl font-semibold mb-4 text-white">Preview</h2>
+      <pre id="preview" class="bg-gray-800 text-green-200 rounded p-4 text-sm overflow-x-auto">{}</pre>
+    </section>
+  </main>
+  <script>
+    // Initialize with one embed for user convenience
+    window.onload = function() {
+      addEmbed();
+      updatePreview();
+    };
+  </script>
+</body>
+</html>

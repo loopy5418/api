@@ -604,3 +604,23 @@ def admin_evaluate():
         })
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 500
+
+@app.route("/try/webhook")
+def try_webhook():
+    return render_template("try/webhook.html")
+
+
+@app.route("/try/qr")
+def try_webhook():
+    return render_template("try/qr.html")
+
+
+@app.route("/try/encrypt")
+def try_webhook():
+    return render_template("try/encrypt.html")
+
+
+@app.route("/try/image")
+def try_webhook():
+    return render_template("try/image.html")
+

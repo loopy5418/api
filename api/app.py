@@ -623,3 +623,9 @@ def try_encrypt():
 def try_image():
     return render_template("try/image.html")
 
+@app.route("/reverse")
+def reverse():
+    text = request.args.get("text")
+    if not text:
+        return jsonify({"error": "Missing 'text' query parameter.", "success": False}), 400
+    return jsonify({"result": text[::-1], "success": True})

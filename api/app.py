@@ -160,6 +160,14 @@ def is_admin():
     allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
     return key in allowed_keys
 
+def checkapikey(key):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT 1 FROM api_keys WHERE api_key = ?", (key,))
+    result = c.fetchone()
+    conn.close()
+    return result is not None  # Returns True if key exists, False if not
+
 @app.route("/")
 def index():
     user_agent = request.headers.get('User-Agent', '').lower()
@@ -361,6 +369,11 @@ def currency_converter():
     base = request.args.get("base")
     target = request.args.get("target")
     amount = request.args.get("amount")
+    apikey = request.args.get("key")
+    if not apikey:
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
+    if not checkapikey(key):
+        return jsonify({"message": "Invalid API key", "success": False), 403
     if not base or not target or not amount:
         return jsonify({"error": "Parameters 'base', 'target', and 'amount' are required.", "success": False}), 400
     try:
@@ -401,7 +414,11 @@ def image_with_text():
     color = data.get("color", "#FFFFFF")
     font_size = data.get("font_size", 32)
     font_style = data.get("font_style", "normal").lower()
-
+    apikey = data.get("api_key")
+    if not apikey:
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Add "api_key" parameter to your request body.", "success": False})
+    if not checkapikey(key):
+        return jsonify({"message": "Invalid API key", "success": False), 403
     if not image_url or not text:
         return jsonify({"error": "'image_url' and 'text' are required fields.", "success": False}), 400
 
@@ -472,6 +489,11 @@ def qr_code():
     import qrcode
     import io
     data = request.args.get("data")
+    apikey = request.args.get("key")
+    if not apikey:
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=api_key_here", "success": False})
+    if not checkapikey(key):
+        return jsonify({"message": "Invalid API key", "success": False), 403
     if not data:
         return jsonify({"error": "Missing 'data' query parameter.", "success": False}), 400
     img = qrcode.make(data)
@@ -488,6 +510,11 @@ def wifi_qr():
     password = request.args.get("password", "")
     security = request.args.get("security", "WPA")
     hidden = request.args.get("hidden", "false").lower() == "true"
+    apikey = request.args.get("key")
+    if not apikey:
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
+    if not checkapikey(key):
+        return jsonify({"message": "Invalid API key", "success": False), 403
     if not ssid:
         return jsonify({"error": "Missing 'ssid' query parameter.", "success": False}), 400
     qr_data = f"WIFI:T:{security};S:{ssid};P:{password};{'H:true;' if hidden else ''};"

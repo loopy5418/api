@@ -6,4 +6,3 @@ Pillow
 flask-cors
 qrcode[pil]
 googletrans
-sqlite3

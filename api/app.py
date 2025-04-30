@@ -416,7 +416,7 @@ def image_with_text():
     font_style = data.get("font_style", "normal").lower()
     apikey = data.get("api_key")
     if not apikey:
-        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Add "api_key" parameter to your request body.", "success": False})
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Add 'api_key' parameter to your request body.", "success": False})
     if not checkapikey(apikey):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not image_url or not text:

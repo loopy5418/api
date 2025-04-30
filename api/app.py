@@ -158,10 +158,6 @@ def is_admin():
     allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
     return key in allowed_keys
 
-# Example route to test the system
-@app.route('/')
-def index():
-    return "API is running."
 @app.route("/")
 def index():
     user_agent = request.headers.get('User-Agent', '').lower()

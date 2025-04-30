@@ -35,8 +35,7 @@ def format_duration(seconds):
 app = Flask(__name__, static_folder="templates/static")
 app.register_blueprint(errors)
 CORS(app)
-with app.app_context():
-    init_db()
+
 def restart_heroku_dyno():
     app_name = os.environ.get("HEROKU_APP_NAME")
     api_key = os.environ.get("HEROKU_API_KEY")
@@ -85,7 +84,8 @@ def init_db():
                 )''')
     conn.commit()
     conn.close()
-
+with app.app_context():
+    init_db()
 # API to generate a new key for a user
 @app.route('/generate-key', methods=['POST'])
 def generate_key():

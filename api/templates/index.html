@@ -589,6 +589,34 @@
 }</code></pre>
         </div>
       </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-timezone')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/convert-timezone</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-timezone" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Query Parameters</h3>
+          <ul class="list-disc pl-6 text-sm mb-4">
+            <li><strong>to</strong>: The base timezone. (e.g. UTC, required)</li>
+            <li><strong>from</strong>: The timezone to convert to. (e.g. Asia/Tokyo, required)</li>
+            <li><strong>time</strong>: The time to convert. (e.g. 16:00, required)</li>
+          </ul>
+          <h3 class="font-semibold">Example URL</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/convert-timezone?from=UTC&to=Asia/Tokyo&time=14:00</p>
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "from": "UTC",
+  "to": "Asia/Tokyo",
+  "original_time": "2025-04-30 14:00 UTC",
+  "converted time": "2025-04-30 23:00 JST",
+  "success": true
+}</code></pre>
+        </div>
+      </div>
   </main>
 </body>
 </html>

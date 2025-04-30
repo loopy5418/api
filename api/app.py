@@ -2,7 +2,6 @@ from flask import Flask, Response, jsonify, request, render_template, abort, red
 import psutil
 import platform
 import time
-from flask import jsonify
 from .errors import errors
 import os
 import requests
@@ -17,6 +16,8 @@ from flask_cors import CORS
 import logging
 import string
 from zoneinfo import ZoneInfo
+import uuid
+import sqlite3
 
 start_time = time.time()
 
@@ -64,6 +65,103 @@ class IgnoreSysinfoFilter(logging.Filter):
 for handler in app.logger.handlers:
     handler.addFilter(IgnoreSysinfoFilter())
 
+DATABASE = 'api_keys.db'
+
+# Helper function to get the DB connection
+def get_db():
+    conn = sqlite3.connect(DATABASE)
+    return conn
+
+# Initialize the database and create the table
+def init_db():
+    conn = get_db()
+    c = conn.cursor()
+    # Create table if it doesn't exist
+    c.execute('''CREATE TABLE IF NOT EXISTS api_keys (
+                    user_id TEXT PRIMARY KEY,
+                    api_key TEXT NOT NULL
+                )''')
+    conn.commit()
+    conn.close()
+
+# API to generate a new key for a user
+@app.route('/generate-key', methods=['POST'])
+def generate_key():
+    # Admin check
+    if not is_admin():
+        abort(403, description="Forbidden: Invalid API key")
+
+    # Get the user ID from the request body
+    user_id = request.json.get('user_id')
+    if not user_id:
+        abort(400, description="Missing user ID")
+
+    # Generate a new API key (UUID or secure random key)
+    new_api_key = str(uuid.uuid4())
+
+    # Store it in the database
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("INSERT INTO api_keys (user_id, api_key) VALUES (?, ?)", (user_id, new_api_key))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"user_id": user_id, "api_key": new_api_key})
+
+# API to retrieve an existing key for a user
+@app.route('/get-key', methods=['GET'])
+def get_key():
+    # Admin check
+    if not is_admin():
+        abort(403, description="Forbidden: Invalid API key")
+
+    # Get the user ID from the query parameters
+    user_id = request.args.get('user_id')
+    if not user_id:
+        abort(400, description="Missing user ID")
+
+    # Query the database for the API key
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT api_key FROM api_keys WHERE user_id = ?", (user_id,))
+    result = c.fetchone()
+
+    if result:
+        return jsonify({"user_id": user_id, "api_key": result[0]})
+    else:
+        abort(404, description="API key not found")
+
+# API to delete an API key for a user
+@app.route('/delete-key', methods=['DELETE'])
+def delete_key():
+    # Admin check
+    if not is_admin():
+        abort(403, description="Forbidden: Invalid API key")
+
+    # Get the user ID from the request body
+    user_id = request.json.get('user_id')
+    if not user_id:
+        abort(400, description="Missing user ID")
+
+    # Delete the API key from the database
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("DELETE FROM api_keys WHERE user_id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": f"API key for user {user_id} deleted"})
+
+# Mock admin key validation (already in place)
+def is_admin():
+    key = request.headers.get("X-API-KEY")
+    allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
+    return key in allowed_keys
+
+# Example route to test the system
+@app.route('/')
+def index():
+    return "API is running."
 @app.route("/")
 def index():
     user_agent = request.headers.get('User-Agent', '').lower()
@@ -690,57 +788,3 @@ def convert_timezone():
 
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 400
-        
-    @app.route('/generate-key', methods=['POST'])
-def generate_key():
-    is_admin()  # Check if the request is coming from an admin API key
-    
-    # Get the user ID from the request body (for example, as JSON)
-    user_id = request.json.get('user_id')
-    if not user_id:
-        abort(400, description="Missing user ID")
-
-    # Generate a new API key (UUID or something secure)
-    new_api_key = str(uuid.uuid4())
-
-    # Store it in the api_keys dictionary (this is just for demonstration)
-    api_keys[user_id] = new_api_key
-
-    # Return the newly generated key
-    return jsonify({"user_id": user_id, "api_key": new_api_key})
-
-# API to retrieve an existing key for a user
-@app.route('/get-key', methods=['GET'])
-def get_key():
-    is_admin()  # Check if the request is coming from an admin API key
-    
-    # Get the user ID from the query parameters
-    user_id = request.args.get('user_id')
-    if not user_id:
-        abort(400, description="Missing user ID")
-    
-    # Look up the API key in the storage
-    api_key = api_keys.get(user_id)
-    if not api_key:
-        abort(404, description="API key not found")
-
-    return jsonify({"user_id": user_id, "api_key": api_key})
-
-# API to delete an API key for a user
-@app.route('/delete-key', methods=['DELETE'])
-def delete_key():
-    is_admin()  # Check if the request is coming from an admin API key
-    
-    # Get the user ID from the request body (for example, as JSON)
-    user_id = request.json.get('user_id')
-    if not user_id:
-        abort(400, description="Missing user ID")
-    
-    # Remove the API key if it exists
-    if user_id in api_keys:
-        del api_keys[user_id]
-        return jsonify({"message": f"API key for user {user_id} deleted"})
-    
-    abort(404, description="API key not found")
-
-# Example route to test the system (for other purposes)

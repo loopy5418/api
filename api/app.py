@@ -17,7 +17,8 @@ import logging
 import string
 from zoneinfo import ZoneInfo
 import uuid
-import sqlite3
+import psycopg2
+import urllib.parse as up
 
 start_time = time.time()
 
@@ -35,6 +36,19 @@ def format_duration(seconds):
 app = Flask(__name__, static_folder="templates/static")
 app.register_blueprint(errors)
 CORS(app)
+
+def is_admin():
+    key = request.headers.get("X-API-KEY")
+    allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
+    return key in allowed_keys
+
+def checkapikey(key):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT 1 FROM api_keys WHERE api_key = ?", (key,))
+    result = c.fetchone()
+    conn.close()
+    return result is not None  # Returns True if key exists, False if not
 
 def restart_heroku_dyno():
     app_name = os.environ.get("HEROKU_APP_NAME")
@@ -70,103 +84,100 @@ DATABASE = 'api_keys.db'
 
 # Helper function to get the DB connection
 def get_db():
-    conn = sqlite3.connect(DATABASE)
+    db_url = os.environ.get("DATABASE_URL")
+    if not db_url:
+        raise Exception("DATABASE_URL not set")
+
+    up.uses_netloc.append("postgres")
+    url = up.urlparse(db_url)
+
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
     return conn
 
-# Initialize the database and create the table
 def init_db():
     conn = get_db()
     c = conn.cursor()
-    # Create table if it doesn't exist
-    c.execute('''CREATE TABLE IF NOT EXISTS api_keys (
-                    user_id TEXT PRIMARY KEY,
-                    api_key TEXT NOT NULL
-                )''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS api_keys (
+            user_id TEXT PRIMARY KEY,
+            api_key TEXT NOT NULL
+        )
+    ''')
     conn.commit()
     conn.close()
 with app.app_context():
     init_db()
 # API to generate a new key for a user
-@app.route('/generate-key', methods=['POST'])
+@app.route("/generate-key", methods=["POST"])
 def generate_key():
-    # Admin check
-    if not is_admin():
-        abort(403, description="Forbidden: Invalid API key")
+    key = request.headers.get("X-API-KEY")
+    if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):
+        abort(403)
 
-    # Get the user ID from the request body
-    user_id = request.json.get('user_id')
+    data = request.get_json()
+    user_id = data.get("user_id")
+
     if not user_id:
-        abort(400, description="Missing user ID")
+        return jsonify({"error": "Missing user_id"}), 400
 
-    # Generate a new API key (UUID or secure random key)
-    new_api_key = str(uuid.uuid4())
+    api_key = str(uuid.uuid4())
 
-    # Store it in the database
     conn = get_db()
     c = conn.cursor()
-    c.execute("INSERT INTO api_keys (user_id, api_key) VALUES (?, ?)", (user_id, new_api_key))
+    c.execute("INSERT INTO api_keys (user_id, api_key) VALUES (%s, %s) ON CONFLICT (user_id) DO UPDATE SET api_key = EXCLUDED.api_key", (user_id, api_key))
     conn.commit()
     conn.close()
 
-    return jsonify({"user_id": user_id, "api_key": new_api_key})
-
+    return jsonify({"user_id": user_id, "api_key": api_key})
 # API to retrieve an existing key for a user
-@app.route('/get-key', methods=['GET'])
+@app.route("/get-key", methods=["GET"])
 def get_key():
-    # Admin check
-    if not is_admin():
-        abort(403, description="Forbidden: Invalid API key")
+    key = request.headers.get("X-API-KEY")
+    if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):
+        abort(403)
 
-    # Get the user ID from the query parameters
-    user_id = request.args.get('user_id')
+    user_id = request.args.get("user_id")
     if not user_id:
-        abort(400, description="Missing user ID")
+        return jsonify({"error": "Missing user_id"}), 400
 
-    # Query the database for the API key
     conn = get_db()
     c = conn.cursor()
-    c.execute("SELECT api_key FROM api_keys WHERE user_id = ?", (user_id,))
+    c.execute("SELECT api_key FROM api_keys WHERE user_id = %s", (user_id,))
     result = c.fetchone()
+    conn.close()
 
-    if result:
-        return jsonify({"user_id": user_id, "api_key": result[0]})
-    else:
-        abort(404, description="API key not found")
+    if not result:
+        return jsonify({"error": "No API key found"}), 404
 
+    return jsonify({"user_id": user_id, "api_key": result[0]})
 # API to delete an API key for a user
-@app.route('/delete-key', methods=['DELETE'])
+@app.route("/delete-key", methods=["DELETE"])
 def delete_key():
-    # Admin check
-    if not is_admin():
-        abort(403, description="Forbidden: Invalid API key")
+    key = request.headers.get("X-API-KEY")
+    if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):
+        abort(403)
 
-    # Get the user ID from the request body
-    user_id = request.json.get('user_id')
+    data = request.get_json()
+    user_id = data.get("user_id")
+
     if not user_id:
-        abort(400, description="Missing user ID")
+        return jsonify({"error": "Missing user_id"}), 400
 
-    # Delete the API key from the database
     conn = get_db()
     c = conn.cursor()
-    c.execute("DELETE FROM api_keys WHERE user_id = ?", (user_id,))
+    c.execute("DELETE FROM api_keys WHERE user_id = %s", (user_id,))
     conn.commit()
     conn.close()
 
     return jsonify({"message": f"API key for user {user_id} deleted"})
-
 # Mock admin key validation (already in place)
-def is_admin():
-    key = request.headers.get("X-API-KEY")
-    allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
-    return key in allowed_keys
 
-def checkapikey(key):
-    conn = get_db()
-    c = conn.cursor()
-    c.execute("SELECT 1 FROM api_keys WHERE api_key = ?", (key,))
-    result = c.fetchone()
-    conn.close()
-    return result is not None  # Returns True if key exists, False if not
 
 @app.route("/")
 def index():

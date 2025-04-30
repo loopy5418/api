@@ -372,7 +372,7 @@ def currency_converter():
     apikey = request.args.get("key")
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
-    if not checkapikey(key):
+    if not checkapikey(apikey):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not base or not target or not amount:
         return jsonify({"error": "Parameters 'base', 'target', and 'amount' are required.", "success": False}), 400
@@ -417,7 +417,7 @@ def image_with_text():
     apikey = data.get("api_key")
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Add "api_key" parameter to your request body.", "success": False})
-    if not checkapikey(key):
+    if not checkapikey(apikey):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not image_url or not text:
         return jsonify({"error": "'image_url' and 'text' are required fields.", "success": False}), 400
@@ -492,7 +492,7 @@ def qr_code():
     apikey = request.args.get("key")
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=api_key_here", "success": False})
-    if not checkapikey(key):
+    if not checkapikey(apikey):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not data:
         return jsonify({"error": "Missing 'data' query parameter.", "success": False}), 400
@@ -513,7 +513,7 @@ def wifi_qr():
     apikey = request.args.get("key")
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
-    if not checkapikey(key):
+    if not checkapikey(apikey):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not ssid:
         return jsonify({"error": "Missing 'ssid' query parameter.", "success": False}), 400

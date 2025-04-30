@@ -5,4 +5,4 @@ requests
 Pillow
 flask-cors
 qrcode[pil]
-googletrans
+psycopg2-binary

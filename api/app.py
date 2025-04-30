@@ -106,7 +106,7 @@ with app.app_context():
 def checkapikey(key):
     conn = get_db()
     c = conn.cursor()
-    c.execute("SELECT 1 FROM api_keys WHERE api_key = ?", (key,))
+    c.execute("SELECT 1 FROM api_keys WHERE api_key = %s", (key,))
     result = c.fetchone()
     conn.close()
     return result is not None  # Returns True if key exists, False if not

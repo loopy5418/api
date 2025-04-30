@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 from flask_cors import CORS
 import logging
 import string
+from zoneinfo import ZoneInfo
 
 start_time = time.time()
 
@@ -86,7 +87,8 @@ def index():
             "/wifi-qr": "Generates a WiFi QR code from ssid, password, security, and hidden query parameters.",
             "/webhook-send": "Sends a message to a Discord webhook (requires POST data)",
             "/reverse": "Reverses a text string. (requires query params)",
-            "/generate-password": "Generates a password with the specified length. (requires query params)"
+            "/generate-password": "Generates a password with the specified length. (requires query params)",
+            "/convert-timezone": "Converts a time from a specific timezone to a specific timezone."
         },
         "support": {
             "discord": f"{discord_invite}",
@@ -649,3 +651,36 @@ def generate_password():
         "password": password,
         "success": True
     })
+    
+@app.route('/timezone/convert', methods=['GET'])
+def convert_timezone():
+    from_tz = request.args.get('from')
+    to_tz = request.args.get('to')
+    time_str = request.args.get('time')
+    if not from_tz:
+        return jsonify({"error": "Missing 'from' parameter. Example: ?from=UTC", "success": False}), 400
+    if not time_str:
+        return jsonify({"error": "Missing 'time' parameter. Example: ?time=16:00", "success": False}), 400
+    if not to_tz:
+        return jsonify({"error": "Missing 'to' parameter. Example: ?to=Asia/Tokyo", "success": False}), 400
+
+    try:
+        naive_time = datetime.strptime(time_str, "%H:%M")
+        now = datetime.now()
+        aware_time = datetime(
+            now.year, now.month, now.day,
+            naive_time.hour, naive_time.minute,
+            tzinfo=ZoneInfo(from_tz)
+        )
+        converted_time = aware_time.astimezone(ZoneInfo(to_tz))
+
+        return jsonify({
+            "from": from_tz,
+            "to": to_tz,
+            "original_time": aware_time.strftime("%Y-%m-%d %H:%M %Z"),
+            "converted_time": converted_time.strftime("%Y-%m-%d %H:%M %Z"),
+            "success": True
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 400

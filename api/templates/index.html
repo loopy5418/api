@@ -52,7 +52,7 @@
     <!-- API Description -->
     <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
       <p class="text-gray-700 dark:text-gray-300 text-sm">
-        Base URL: <code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">https://api.loopy5418.dev</code><br>No API keys required.
+        Base URL: <code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">https://api.loopy5418.dev</code><br>Some APIs related with image and audio generation require API keys. You can get them in the Discord server.
     </p>
     <div class="mt-6 grid grid-cols-5 gap-4">
       <button
@@ -304,11 +304,13 @@
           </svg>
         </div>
         <div id="endpoint-currency-converter" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <p class="text-sm text-gray-500 dark:text-gray-400">This API requires an API key.</p>
           <h3 class="font-semibold">Query Parameters</h3>
           <ul class="list-disc pl-6 text-sm mb-4">
             <li><strong>base</strong>: The base currency code (e.g., USD)</li>
             <li><strong>target</strong>: The target currency code (e.g., EUR)</li>
             <li><strong>amount</strong>: The amount to convert</li>
+            <li><strong>key</strong>: Your API key</li>
           </ul>
           <h3 class="font-semibold">Example URL</h3>
           <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/currency-converter?base=USD&target=EUR&amount=10</p>
@@ -333,6 +335,7 @@
           </svg>
         </div>
         <div id="endpoint-image-with-text" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <p class="text-sm text-gray-500 dark:text-gray-400">This API requires an API key.</p>
           <h3 class="font-semibold">Request Body</h3>
           <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
   "image_url": "https://example.com/image.png",
@@ -372,6 +375,7 @@
           </svg>
         </div>
         <div id="endpoint-qr" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <p class="text-sm text-gray-500 dark:text-gray-400">This API requires an API key.</p>
           <h3 class="font-semibold">Query Parameters</h3>
           <ul class="list-disc pl-6 text-sm mb-4">
             <li><strong>data</strong>: The text or URL to encode in the QR code (required)</li>
@@ -465,6 +469,7 @@
           </svg>
         </div>
         <div id="endpoint-wifi-qr" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <p class="text-sm text-gray-500 dark:text-gray-400">This API requires an API key.</p>
           <h3 class="font-semibold">Query Parameters</h3>
           <ul class="list-disc pl-6 text-sm mb-4">
             <li><strong>ssid</strong>: WiFi network name (required)</li>

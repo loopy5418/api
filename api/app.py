@@ -15,6 +15,7 @@ import io
 from PIL import Image, ImageDraw, ImageFont
 from flask_cors import CORS
 import logging
+import string
 
 start_time = time.time()
 
@@ -83,8 +84,9 @@ def index():
             "/owoify": "Converts text to owo representation (requires query params)",
             "/choose": "Randomly chooses an option from a comma-separated list (requires query params)",
             "/wifi-qr": "Generates a WiFi QR code from ssid, password, security, and hidden query parameters.",
-            "/translate": "Translates text",
-            "/webhook-send": "Sends a message to a Discord webhook (requires POST data)"
+            "/webhook-send": "Sends a message to a Discord webhook (requires POST data)",
+            "/reverse": "Reverses a text string. (requires query params),
+            "/generate-password": "Generates a password with the specified length. (requires query params)"
         },
         "support": {
             "discord": f"{discord_invite}",
@@ -629,3 +631,21 @@ def reverse():
     if not text:
         return jsonify({"error": "Missing 'text' query parameter.", "success": False}), 400
     return jsonify({"result": text[::-1], "success": True})
+
+@app.route('/generate-password', methods=['GET'])
+def generate_password():
+    try:
+        length = int(request.args.get('length', 12))
+        if length < 4 or length > 128:
+            return jsonify({"error": "Length must be between 4 and 128", "success": False}), 400
+    except ValueError:
+        return jsonify({"error": "Invalid length parameter", "success": Falsr}), 400
+
+    charset = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choices(charset, k=length))
+    
+    return jsonify({
+        "length": length,
+        "password": password,
+        "success": True
+    })

@@ -50,20 +50,39 @@
   </style>
   <script>
     function updatePreview() {
-      const data = document.getElementById('qr-data').value;
-      const preview = document.getElementById('qr-preview');
-      if (data.trim() !== "") {
-        preview.src = `https://api.loopy5418.dev/qr?data=${encodeURIComponent(data)}`;
-        preview.classList.remove('hidden');
-      } else {
-        preview.src = "";
-        preview.classList.add('hidden');
-      }
-    }
+  const data = document.getElementById('qr-data').value.trim();
+  const apiKey = document.getElementById('qr-api-key').value.trim();
+  const preview = document.getElementById('qr-preview');
+
+  if (data === "" || apiKey === "") {
+    preview.src = "";
+    preview.classList.add('hidden');
+    return;
+  }
+
+  const url = `https://api.loopy5418.dev/qr?data=${encodeURIComponent(data)}&key=${encodeURIComponent(apiKey)}`;
+  preview.src = url;
+  preview.classList.remove('hidden');
+}
     function clearQR() {
       document.getElementById('qr-data').value = "";
       updatePreview();
     }
+    
+    function toggleAPIKey() {
+    const input = document.getElementById('qr-api-key');
+    const icon = document.getElementById('eye-icon-path');
+
+    if (input.type === "password") {
+      input.type = "text";
+      // Eye icon without slash (visible state)
+      icon.setAttribute("d", "M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3-9c-5.523 0-10 6-10 6s4.477 6 10 6 10-6 10-6-4.477-6-10-6z");
+    } else {
+      input.type = "password";
+      // Eye with diagonal slash (hidden state)
+      icon.setAttribute("d", "M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-6-10-6s2.273-3.272 5.708-5.059M3 3l18 18M15 15l3.75 3.75M12 12a3 3 0 100-6 3 3 0 000 6z");
+    }
+  }
   </script>
 </head>
 <body class="bg-main text-main min-h-screen">
@@ -83,6 +102,14 @@
     <section class="md:w-1/2 rounded-xl p-6 border-light">
       <h2 class="text-xl font-semibold mb-4">Generate a QR Code</h2>
       <div class="mb-3">
+<div class="mb-3 relative">
+  <input id="qr-api-key" type="password" class="input-main block w-full mb-2 p-2 pr-10 rounded-lg" placeholder="API Key (required)">
+  <button type="button" onclick="toggleAPIKey()" class="absolute right-2 top-2 text-gray-400 hover:text-gray-200" title="Show/Hide API Key">
+    <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path id="eye-icon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-6-10-6s2.273-3.272 5.708-5.059M3 3l18 18M15 15l3.75 3.75M12 12a3 3 0 100-6 3 3 0 000 6z" />
+    </svg>
+  </button>
+</div>
         <textarea id="qr-data" rows="7" class="input-main block w-full mb-2 p-2 rounded-lg resize-y" placeholder="Data to encode (required)" oninput="updatePreview()"></textarea>
       </div>
       <div class="flex gap-2">

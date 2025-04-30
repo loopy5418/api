@@ -37,18 +37,7 @@ app = Flask(__name__, static_folder="templates/static")
 app.register_blueprint(errors)
 CORS(app)
 
-def is_admin():
-    key = request.headers.get("X-API-KEY")
-    allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
-    return key in allowed_keys
 
-def checkapikey(key):
-    conn = get_db()
-    c = conn.cursor()
-    c.execute("SELECT 1 FROM api_keys WHERE api_key = ?", (key,))
-    result = c.fetchone()
-    conn.close()
-    return result is not None  # Returns True if key exists, False if not
 
 def restart_heroku_dyno():
     app_name = os.environ.get("HEROKU_APP_NAME")
@@ -113,6 +102,14 @@ def init_db():
     conn.close()
 with app.app_context():
     init_db()
+    
+def checkapikey(key):
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT 1 FROM api_keys WHERE api_key = ?", (key,))
+    result = c.fetchone()
+    conn.close()
+    return result is not None  # Returns True if key exists, False if not
 # API to generate a new key for a user
 @app.route("/generate-key", methods=["POST"])
 def generate_key():

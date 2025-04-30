@@ -85,7 +85,7 @@ def index():
             "/choose": "Randomly chooses an option from a comma-separated list (requires query params)",
             "/wifi-qr": "Generates a WiFi QR code from ssid, password, security, and hidden query parameters.",
             "/webhook-send": "Sends a message to a Discord webhook (requires POST data)",
-            "/reverse": "Reverses a text string. (requires query params),
+            "/reverse": "Reverses a text string. (requires query params)",
             "/generate-password": "Generates a password with the specified length. (requires query params)"
         },
         "support": {

@@ -50,59 +50,61 @@
   </style>
   <script>
     async function generateImageWithText() {
-      const image_url = document.getElementById('img-url').value.trim();
-      const text = document.getElementById('img-text').value;
-      const position = document.getElementById('img-position').value.trim();
-      const color = document.getElementById('img-color').value.trim();
-      const font_size = parseInt(document.getElementById('img-font-size').value, 10);
-      const font_style = document.getElementById('img-font-style').value;
+  const image_url = document.getElementById('img-url').value.trim();
+  const text = document.getElementById('img-text').value;
+  const position = document.getElementById('img-position').value.trim();
+  const color = document.getElementById('img-color').value.trim();
+  const font_size = parseInt(document.getElementById('img-font-size').value, 10);
+  const font_style = document.getElementById('img-font-style').value;
+  const api_key = document.getElementById('img-api-key').value.trim(); // NEW
 
-      const status = document.getElementById('img-status');
-      const preview = document.getElementById('img-preview');
-      preview.src = "";
-      status.textContent = "";
+  const status = document.getElementById('img-status');
+  const preview = document.getElementById('img-preview');
+  preview.src = "";
+  status.textContent = "";
 
-      if (!image_url || !text) {
-        status.textContent = "❌ 'image_url' and 'text' are required.";
-        status.className = "text-red-400 mt-2";
-        return;
-      }
+  if (!image_url || !text || !api_key) {
+    status.textContent = "❌ 'image_url', 'text', and 'api_key' are required.";
+    status.className = "text-red-400 mt-2";
+    return;
+  }
 
-      status.textContent = "⏳ Generating...";
-      status.className = "text-yellow-400 mt-2";
+  status.textContent = "⏳ Generating...";
+  status.className = "text-yellow-400 mt-2";
 
-      try {
-        const resp = await fetch("https://api.loopy5418.dev/image-with-text", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            image_url,
-            text,
-            position: position || undefined,
-            color: color || undefined,
-            font_size: isNaN(font_size) ? undefined : font_size,
-            font_style: font_style || undefined
-          })
-        });
+  try {
+    const resp = await fetch("https://api.loopy5418.dev/image-with-text", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key, // NEW
+        image_url,
+        text,
+        position: position || undefined,
+        color: color || undefined,
+        font_size: isNaN(font_size) ? undefined : font_size,
+        font_style: font_style || undefined
+      })
+    });
 
-        if (resp.ok && resp.headers.get("content-type").startsWith("image/")) {
-          const blob = await resp.blob();
-          preview.src = URL.createObjectURL(blob);
-          preview.classList.remove("hidden");
-          status.textContent = "✅ Success!";
-          status.className = "text-green-400 mt-2";
-        } else {
-          const data = await resp.json();
-          status.textContent = "❌ " + (data.error || "Failed to generate image.");
-          status.className = "text-red-400 mt-2";
-          preview.classList.add("hidden");
-        }
-      } catch (e) {
-        status.textContent = "❌ Network error.";
-        status.className = "text-red-400 mt-2";
-        preview.classList.add("hidden");
-      }
+    if (resp.ok && resp.headers.get("content-type").startsWith("image/")) {
+      const blob = await resp.blob();
+      preview.src = URL.createObjectURL(blob);
+      preview.classList.remove("hidden");
+      status.textContent = "✅ Success!";
+      status.className = "text-green-400 mt-2";
+    } else {
+      const data = await resp.json();
+      status.textContent = "❌ " + (data.error || "Failed to generate image.");
+      status.className = "text-red-400 mt-2";
+      preview.classList.add("hidden");
     }
+  } catch (e) {
+    status.textContent = "❌ Network error.";
+    status.className = "text-red-400 mt-2";
+    preview.classList.add("hidden");
+  }
+}
 
     function clearFields() {
       document.getElementById('img-url').value = '';
@@ -134,6 +136,7 @@
     <section class="md:w-1/2 rounded-xl p-6 border-light">
       <h2 class="text-xl font-semibold mb-4">Overlay Text on an Image</h2>
       <div class="mb-3">
+        <input id="img-api-key" type="password" class="input-main block w-full mb-2 p-2 rounded-lg" placeholder="API Key (required)">
         <input id="img-url" class="input-main block w-full mb-2 p-2 rounded-lg" placeholder="Image URL (required)">
         <textarea id="img-text" rows="3" class="input-main block w-full mb-2 p-2 rounded-lg resize-y" placeholder="Text to overlay (required)"></textarea>
         <input id="img-position" class="input-main block w-full mb-2 p-2 rounded-lg" placeholder="Position (e.g. top, center, bottom, or x,y)">

@@ -652,7 +652,7 @@ def generate_password():
         "success": True
     })
     
-@app.route('/timezone/convert', methods=['GET'])
+@app.route('/convert-timezone', methods=['GET'])
 def convert_timezone():
     from_tz = request.args.get('from')
     to_tz = request.args.get('to')

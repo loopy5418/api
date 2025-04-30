@@ -21,3 +21,6 @@ def run_bot():
     if not token:
         raise RuntimeError("DISCORD_BOT_TOKEN not found in environment variables")
     bot.run(token)
+    
+if __name__ == "__main__":
+    run_bot()

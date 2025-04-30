@@ -20,6 +20,12 @@ from zoneinfo import ZoneInfo
 
 start_time = time.time()
 
+def is_admin():
+    key = request.headers.get("X-API-KEY")
+    allowed_keys = os.environ.get("ADMIN_API_KEYS", "").split(",")
+    if key not in allowed_keys:
+        abort(403, description="Forbidden: Invalid API key")
+
 def format_duration(seconds):
     hours, remainder = divmod(int(seconds), 3600)
     minutes, seconds = divmod(remainder, 60)
@@ -684,3 +690,57 @@ def convert_timezone():
 
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 400
+        
+    @app.route('/generate-key', methods=['POST'])
+def generate_key():
+    is_admin()  # Check if the request is coming from an admin API key
+    
+    # Get the user ID from the request body (for example, as JSON)
+    user_id = request.json.get('user_id')
+    if not user_id:
+        abort(400, description="Missing user ID")
+
+    # Generate a new API key (UUID or something secure)
+    new_api_key = str(uuid.uuid4())
+
+    # Store it in the api_keys dictionary (this is just for demonstration)
+    api_keys[user_id] = new_api_key
+
+    # Return the newly generated key
+    return jsonify({"user_id": user_id, "api_key": new_api_key})
+
+# API to retrieve an existing key for a user
+@app.route('/get-key', methods=['GET'])
+def get_key():
+    is_admin()  # Check if the request is coming from an admin API key
+    
+    # Get the user ID from the query parameters
+    user_id = request.args.get('user_id')
+    if not user_id:
+        abort(400, description="Missing user ID")
+    
+    # Look up the API key in the storage
+    api_key = api_keys.get(user_id)
+    if not api_key:
+        abort(404, description="API key not found")
+
+    return jsonify({"user_id": user_id, "api_key": api_key})
+
+# API to delete an API key for a user
+@app.route('/delete-key', methods=['DELETE'])
+def delete_key():
+    is_admin()  # Check if the request is coming from an admin API key
+    
+    # Get the user ID from the request body (for example, as JSON)
+    user_id = request.json.get('user_id')
+    if not user_id:
+        abort(400, description="Missing user ID")
+    
+    # Remove the API key if it exists
+    if user_id in api_keys:
+        del api_keys[user_id]
+        return jsonify({"message": f"API key for user {user_id} deleted"})
+    
+    abort(404, description="API key not found")
+
+# Example route to test the system (for other purposes)

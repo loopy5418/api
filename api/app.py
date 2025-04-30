@@ -371,7 +371,7 @@ def currency_converter():
     amount = request.args.get("amount")
     apikey = request.args.get("key")
     if not apikey:
-        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False}), 400
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
     if not checkapikey(key):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not base or not target or not amount:
@@ -388,7 +388,7 @@ def currency_converter():
             return jsonify({"error": "Failed to fetch exchange rate.", "success": False}), 500
         data = resp.json()
         if target.upper() not in data.get("rates", {}):
-            return jsonify({"error": f"Currency conversion failed: {data.get('error', 'Unknown error')}", "success": False}), 400
+            return jsonify({"error": f"Currency conversion failed: {data.get('error', 'Unknown error')}", "success": False})
         return jsonify({
             "base": data["base"],
             "target": target.upper(),
@@ -416,7 +416,7 @@ def image_with_text():
     font_style = data.get("font_style", "normal").lower()
     apikey = data.get("api_key")
     if not apikey:
-        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Add "api_key" parameter to your request body.", "success": False}), 400
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Add "api_key" parameter to your request body.", "success": False})
     if not checkapikey(key):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not image_url or not text:
@@ -491,7 +491,7 @@ def qr_code():
     data = request.args.get("data")
     apikey = request.args.get("key")
     if not apikey:
-        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=api_key_here", "success": False}), 400
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=api_key_here", "success": False})
     if not checkapikey(key):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not data:
@@ -512,7 +512,7 @@ def wifi_qr():
     hidden = request.args.get("hidden", "false").lower() == "true"
     apikey = request.args.get("key")
     if not apikey:
-        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False}), 400
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
     if not checkapikey(key):
         return jsonify({"message": "Invalid API key", "success": False}), 403
     if not ssid:

@@ -136,7 +136,8 @@
         </ul>
         <h3 class="font-semibold">Response Preview</h3>
         <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
-  "formatted_time": "01:23:20"
+  "formatted_time": "01:23:20",
+  "success": true
 }</code></pre>
       </div>
     </div>
@@ -169,7 +170,8 @@
     "utc_time": "2025-04-24 17:13:37",
     "week_of_year": "16",
     "year": 2025,
-    "year_short": 25
+    "year_short": 25,
+    "success": true
 }</code></pre>
         </div>
       </div>
@@ -212,7 +214,8 @@
 }</code></pre>
           <h3 class="font-semibold">Response Preview</h3>
           <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
-  "encrypted_data": "SGVsbG8sIFdvcmxkIQ=="
+  "encrypted_data": "SGVsbG8sIFdvcmxkIQ==",
+  "success": true
 }</code></pre>
         </div>
       </div>
@@ -232,7 +235,8 @@
 }</code></pre>
           <h3 class="font-semibold">Response Preview</h3>
           <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
-  "decrypted_data": "Hello, World!"
+  "decrypted_data": "Hello, World!",
+  "success": true
 }</code></pre>
         </div>
       </div>
@@ -270,7 +274,8 @@
           <h3 class="font-semibold">Response Preview</h3>
           <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
   "algorithm": "sha256",
-  "hash": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447"
+  "hash": "a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447",
+  "success": true
 }</code></pre>
         </div>
       </div>
@@ -287,7 +292,8 @@
         <div id="endpoint-uuid-generator" class="px-6 py-4 hidden border-t dark:border-gray-700">
           <h3 class="font-semibold">Response Preview</h3>
           <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
-  "uuid": "123e4567-e89b-12d3-a456-426614174000"
+  "uuid": "123e4567-e89b-12d3-a456-426614174000",
+  "success": true
 }</code></pre>
         </div>
       </div>
@@ -320,7 +326,8 @@
   "target": "EUR",
   "amount": 10,
   "converted": 9.25,
-  "rate": 0.925
+  "rate": 0.925,
+  "success": true
 }</code></pre>
         </div>
       </div>
@@ -622,6 +629,30 @@
 }</code></pre>
         </div>
       </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-sqrt')">
+        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+        <span class="flex-1 ml-2 text-lg">/sqrt</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      <div id="endpoint-sqrt" class="px-6 py-4 hidden border-t dark:border-gray-700">
+        <h3 class="font-semibold">Query Parameters</h3>
+        <ul class="list-disc pl-6 text-sm mb-4">
+          <li><strong>numbet</strong>: Number to get the sqrt of (required)</li>
+        </ul>
+        <h3 class="font-semibold">Example URL</h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/sqrt?number=25</p>
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "success": true,
+  "number": 25,
+  "sqrt": 5.0
+}</code></pre>
+      </div>
+    </div>
   </main>
 </body>
 </html>

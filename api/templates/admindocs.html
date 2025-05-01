@@ -56,7 +56,7 @@
       </div>
 
       <div class="mb-4 p-4 rounded-xl bg-gray-800 shadow cursor-pointer" onclick="toggleDetails('restart')">
-        <span class="bg-green-600 text-white font-bold py-1 px-2 rounded text-sm">GET</span>
+        <span class="bg-yellow-300 text-orange-800 font-bold py-1 px-2 rounded text-sm">POST</span>
         <span class="ml-2 font-mono text-white">/restart</span>
       </div>
       <div id="restart" class="hidden bg-gray-900 p-4 rounded-xl mb-4">
@@ -102,6 +102,96 @@
 }</code></pre>
         </div>
       </div>
+      
+<!-- /admin/generate-key -->
+<div class="mb-4 p-4 rounded-xl bg-gray-800 shadow cursor-pointer" onclick="toggleDetails('genkey')">
+  <span class="bg-yellow-300 text-orange-800 font-bold py-1 px-2 rounded text-sm">POST</span>
+  <span class="ml-2 font-mono text-white">/admin/generate-key</span>
+</div>
+<div id="genkey" class="hidden bg-gray-900 p-4 rounded-xl mb-4">
+  <h3 class="text-lg font-semibold mb-2">Details</h3>
+  <p class="mb-2 text-gray-400">Generates a user API key (not admin).</p>
+  <div class="mb-2">
+    <h4 class="font-semibold">Headers:</h4>
+    <ul class="list-disc list-inside text-gray-300">
+      <li><span class="font-mono">X-API-KEY</span>: string (admin API key, required)</li>
+    </ul>
+  </div>
+  <div>
+    <h4 class="font-semibold mb-1">Request Body:</h4>
+    <pre><code class="language-json">{
+  "user_id": "1016311833382105100"
+}</code></pre>
+  </div>
+  <div>
+    <h4 class="font-semibold mb-1">Example Response:</h4>
+    <pre><code class="language-json">{
+  "api_key": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+  "user_id": "1016311833382105100"
+}</code></pre>
+  </div>
+</div>
+
+<!-- /admin/get-key -->
+<div class="mb-4 p-4 rounded-xl bg-gray-800 shadow cursor-pointer" onclick="toggleDetails('getkey')">
+  <span class="bg-green-600 text-white font-bold py-1 px-2 rounded text-sm">GET</span>
+  <span class="ml-2 font-mono text-white">/admin/get-key</span>
+</div>
+<div id="getkey" class="hidden bg-gray-900 p-4 rounded-xl mb-4">
+  <h3 class="text-lg font-semibold mb-2">Details</h3>
+  <p class="mb-2 text-gray-400">Retrieves a user's API key.</p>
+  <div class="mb-2">
+    <h4 class="font-semibold">Query Parameters:</h4>
+    <ul class="list-disc list-inside text-gray-300">
+      <li><span class="font-mono">user_id</span>: string (required)</li>
+    </ul>
+  </div>
+  <div class="mb-2">
+    <h4 class="font-semibold">Headers:</h4>
+    <ul class="list-disc list-inside text-gray-300">
+      <li><span class="font-mono">X-API-KEY</span>: string (admin API key, required)</li>
+    </ul>
+  </div>
+  <div>
+    <h4 class="font-semibold mb-1">Example URL:</h4>
+    <p class="text-sm text-gray-400">https://api.loopy5418.dev/admin/get-key?user_id=1016311833382105100</p>
+    <h4 class="font-semibold mb-1 mt-2">Example Response:</h4>
+    <pre><code class="language-json">{
+  "api_key": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+  "user_id": "1016311833382105100"
+}</code></pre>
+  </div>
+</div>
+
+<!-- /admin/delete-key -->
+<div class="mb-4 p-4 rounded-xl bg-gray-800 shadow cursor-pointer" onclick="toggleDetails('delkey')">
+  <span class="bg-red-600 text-white font-bold py-1 px-2 rounded text-sm">DELETE</span>
+  <span class="ml-2 font-mono text-white">/admin/delete-key</span>
+</div>
+<div id="delkey" class="hidden bg-gray-900 p-4 rounded-xl mb-4">
+  <h3 class="text-lg font-semibold mb-2">Details</h3>
+  <p class="mb-2 text-gray-400">Deletes a user’s API key.</p>
+  <div class="mb-2">
+    <h4 class="font-semibold">Query Parameters:</h4>
+    <ul class="list-disc list-inside text-gray-300">
+      <li><span class="font-mono">user_id</span>: string (required)</li>
+    </ul>
+  </div>
+  <div class="mb-2">
+    <h4 class="font-semibold">Headers:</h4>
+    <ul class="list-disc list-inside text-gray-300">
+      <li><span class="font-mono">X-API-KEY</span>: string (admin API key, required)</li>
+    </ul>
+  </div>
+  <div>
+    <h4 class="font-semibold mb-1">Example URL:</h4>
+    <p class="text-sm text-gray-400">https://api.loopy5418.dev/admin/delete-key?user_id=1016311833382105100</p>
+    <h4 class="font-semibold mb-1 mt-2">Example Response:</h4>
+    <pre><code class="language-json">{
+  "message": "API key for user 1016311833382105100 deleted"
+}</code></pre>
+  </div>
+</div>
   </main>
 </body>
 </html>

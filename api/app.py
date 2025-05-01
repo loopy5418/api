@@ -108,6 +108,27 @@ def checkapikey(key):
     conn.close()
     return result is not None
 
+@app.route("/admin/get-user-id", methods=["GET"])
+def get_user_id_from_key():
+    key = request.headers.get("X-API-KEY")
+    if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):
+        abort(403)
+
+    api_key = request.args.get("api_key")
+    if not api_key:
+        return jsonify({"error": "Missing api_key", "success": False}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT user_id FROM api_keys WHERE api_key = %s", (api_key,))
+    result = c.fetchone()
+    conn.close()
+
+    if not result:
+        return jsonify({"error": "API key not found", "success": False}), 404
+
+    return jsonify({"api_key": api_key, "user_id": result[0], "success": False})
+
 @app.route("/admin/generate-key", methods=["POST"])
 def generate_key():
     key = request.headers.get("X-API-KEY")
@@ -120,11 +141,18 @@ def generate_key():
     if not user_id:
         return jsonify({"error": "Missing user_id", "success": False}), 400
 
-    api_key = str(uuid.uuid4())
-
     conn = get_db()
     c = conn.cursor()
-    c.execute("INSERT INTO api_keys (user_id, api_key) VALUES (%s, %s) ON CONFLICT (user_id) DO UPDATE SET api_key = EXCLUDED.api_key", (user_id, api_key))
+
+    c.execute("SELECT api_key FROM api_keys WHERE user_id = %s", (user_id,))
+    existing = c.fetchone()
+
+    if existing:
+        conn.close()
+        return jsonify({"user_id": user_id, "api_key": existing[0], "success": False, "error": "API Key for this user already exists"})
+
+    api_key = str(uuid.uuid4())
+    c.execute("INSERT INTO api_keys (user_id, api_key) VALUES (%s, %s)", (user_id, api_key))
     conn.commit()
     conn.close()
 

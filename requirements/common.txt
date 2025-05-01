@@ -6,3 +6,4 @@ Pillow
 flask-cors
 qrcode[pil]
 psycopg2-binary
+py-cord==2.5.0

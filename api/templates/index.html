@@ -641,7 +641,7 @@
       <div id="endpoint-sqrt" class="px-6 py-4 hidden border-t dark:border-gray-700">
         <h3 class="font-semibold">Query Parameters</h3>
         <ul class="list-disc pl-6 text-sm mb-4">
-          <li><strong>numbet</strong>: Number to get the sqrt of (required)</li>
+          <li><strong>number</strong>: Number to get the sqrt of (required)</li>
         </ul>
         <h3 class="font-semibold">Example URL</h3>
                   <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/sqrt?number=25</p>
@@ -665,7 +665,7 @@
       <div id="endpoint-cbrt" class="px-6 py-4 hidden border-t dark:border-gray-700">
         <h3 class="font-semibold">Query Parameters</h3>
         <ul class="list-disc pl-6 text-sm mb-4">
-          <li><strong>numbet</strong>: Number to get the cuberoot of (required)</li>
+          <li><strong>number</strong>: Number to get the cuberoot of (required)</li>
         </ul>
         <h3 class="font-semibold">Example URL</h3>
                   <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/cbrt?number=-8</p>
@@ -674,6 +674,29 @@
   "success": true,
   "number": -8,
   "cbrt": -2
+}</code></pre>
+      </div>
+    </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+      <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-asciiart')">
+        <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+        <span class="flex-1 ml-2 text-lg">/ascii-art</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      <div id="endpoint-asciiart" class="px-6 py-4 hidden border-t dark:border-gray-700">
+        <h3 class="font-semibold">Query Parameters</h3>
+        <ul class="list-disc pl-6 text-sm mb-4">
+          <li><strong>text</strong>: Text to turn into ascii art. (required)</li>
+        </ul>
+        <h3 class="font-semibold">Example URL</h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/ascii-art?text=Hello</p>
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "success": true,
+  "ascii_art": " _   _      _ _         \n| | | | ___| | | ___    \n| |_| |/ _ \\ | |/ _ \\ \n|  _  |  __/ | | (_) |  \n|_| |_|\\___|_|_|\\___/ \n"
 }</code></pre>
       </div>
     </div>

@@ -159,9 +159,7 @@ def delete_key():
     key = request.headers.get("X-API-KEY")
     if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):
         abort(403)
-
-    data = request.get_json()
-    user_id = data.get("user_id")
+    user_id = request.args.get("user_id")
 
     if not user_id:
         return jsonify({"error": "Missing user_id"}), 400

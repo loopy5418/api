@@ -864,3 +864,22 @@ def sqrt():
 
     except ValueError:
         return jsonify({'success': False, 'error': 'Invalid number provided'}), 400
+        
+@app.route('/cbrt')
+def cube_root():
+    try:
+        num_str = request.args.get('number', '')
+        if num_str == '':
+            return jsonify({'success': False, 'error': 'Missing number parameter'}), 400
+
+        num = float(num_str)
+        result = num ** (1.0 / 3.0)
+
+        # Handle cube root of negative numbers correctly
+        if num < 0:
+            result = -(-num) ** (1.0 / 3.0)
+
+        return jsonify({'success': True, 'number': num, 'cbrt': result})
+
+    except ValueError:
+        return jsonify({'success': False, 'error': 'Invalid number provided'}), 400

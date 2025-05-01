@@ -13,6 +13,9 @@ TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 @bot.slash_command(name="get-api-key", description="Generate your API key.")
 @commands.cooldown(1, 60, commands.BucketType.user)  # 1 request per 60 seconds per user
 async def get_api_key(ctx: discord.ApplicationContext):
+    if ctx.channel.id != 1365262462596677653:
+        await ctx.respond("You can only execute that command in <#1365262462596677653>", ephemeral=True)
+        return
     await ctx.defer()  # Acknowledge the command
 
     async with aiohttp.ClientSession() as session:

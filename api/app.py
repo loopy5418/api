@@ -197,6 +197,10 @@ def delete_key():
 
     return jsonify({"message": f"API key for user {user_id} deleted", "success": True})
 
+@app.route("/admin/keys")
+def keyeditor():
+    return render_template("keymaker.html")
+
 @app.route("/")
 def index():
     user_agent = request.headers.get('User-Agent', '').lower()

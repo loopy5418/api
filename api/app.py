@@ -846,3 +846,20 @@ def convert_timezone():
 
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 400
+        
+@app.route('/sqrt')
+def sqrt():
+    try:
+        num_str = request.args.get('number', '')
+        if num_str == '':
+            return jsonify({'success': False, 'error': 'Missing number parameter'}), 400
+
+        num = float(num_str)
+        if num < 0:
+            return jsonify({'success': False, 'error': 'Cannot take square root of a negative number'}), 400
+
+        result = math.sqrt(num)
+        return jsonify({'success': True, 'number': num, 'sqrt': result})
+
+    except ValueError:
+        return jsonify({'success': False, 'error': 'Invalid number provided'}), 400

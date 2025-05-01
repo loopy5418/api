@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin API Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="bg-gray-800 rounded-xl p-8 w-full max-w-2xl shadow-lg">
+    <h1 class="text-2xl font-bold mb-6 text-center">Admin API Panel</h1>
+
+    <!-- Admin Key Input -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Admin API Key</label>
+      <input type="text" id="adminKey" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600" placeholder="Enter admin API key">
+    </div>
+
+    <!-- Action Select -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Action</label>
+      <select id="actionSelect" onchange="toggleForm()" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600">
+        <option value="">Select an action...</option>
+        <option value="generate">Generate Key</option>
+        <option value="getkey">Get Key</option>
+        <option value="getuserid">Get User ID</option>
+        <option value="deletekey">Delete Key</option>
+      </select>
+    </div>
+
+    <!-- Forms -->
+    <div id="form-generate" class="hidden mb-4">
+      <label class="block text-sm mb-1">User ID</label>
+      <input type="text" id="genUserId" class="w-full p-2 rounded bg-gray-700 border border-gray-600 mb-2" placeholder="User ID">
+      <button onclick="generateKey()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Generate</button>
+    </div>
+
+    <div id="form-getkey" class="hidden mb-4">
+      <label class="block text-sm mb-1">User ID</label>
+      <input type="text" id="getKeyUserId" class="w-full p-2 rounded bg-gray-700 border border-gray-600 mb-2" placeholder="User ID">
+      <button onclick="getKey()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Get Key</button>
+    </div>
+
+    <div id="form-getuserid" class="hidden mb-4">
+      <label class="block text-sm mb-1">API Key</label>
+      <input type="text" id="apiKeyLookup" class="w-full p-2 rounded bg-gray-700 border border-gray-600 mb-2" placeholder="User's API Key">
+      <button onclick="getUserId()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">Get User ID</button>
+    </div>
+
+    <div id="form-deletekey" class="hidden mb-4">
+      <label class="block text-sm mb-1">User ID</label>
+      <input type="text" id="delUserId" class="w-full p-2 rounded bg-gray-700 border border-gray-600 mb-2" placeholder="User ID">
+      <button onclick="deleteKey()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Delete Key</button>
+    </div>
+
+    <!-- Response Box -->
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold mb-2">Response</h2>
+      <div id="resultBox" class="bg-gray-700 p-4 rounded text-sm text-white space-y-2"></div>
+    </div>
+  </div>
+
+  <script>
+    function toggleForm() {
+      const forms = ['generate', 'getkey', 'getuserid', 'deletekey'];
+      const selected = document.getElementById('actionSelect').value;
+      forms.forEach(f => {
+        document.getElementById(`form-${f}`).classList.toggle('hidden', f !== selected);
+      });
+      document.getElementById("resultBox").innerHTML = "";
+    }
+
+    function showResult(data) {
+      const box = document.getElementById('resultBox');
+      box.innerHTML = '';
+
+      const addLine = (label, value, isError = false) => {
+        const line = document.createElement('div');
+        line.className = `text-sm ${isError ? 'text-red-400' : 'text-green-300'}`;
+        line.innerHTML = `<strong>${label}:</strong> ${value}`;
+        box.appendChild(line);
+      };
+
+      if (typeof data !== 'object') {
+        addLine("Response", data, true);
+        return;
+      }
+
+      if ('success' in data) {
+        addLine("Success", data.success ? "true" : "false", !data.success);
+      }
+
+      for (const [key, value] of Object.entries(data)) {
+        if (key !== 'success') {
+          addLine(key, value);
+        }
+      }
+    }
+
+    async function generateKey() {
+      const userId = document.getElementById('genUserId').value;
+      const key = document.getElementById('adminKey').value;
+
+      const res = await fetch('/admin/generate-key', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': key
+        },
+        body: JSON.stringify({ user_id: userId })
+      });
+
+      const json = await res.json();
+      showResult(json);
+    }
+
+    async function getKey() {
+      const userId = document.getElementById('getKeyUserId').value;
+      const key = document.getElementById('adminKey').value;
+
+      const res = await fetch(`/admin/get-key?user_id=${encodeURIComponent(userId)}`, {
+        headers: { 'X-API-KEY': key }
+      });
+
+      const json = await res.json();
+      showResult(json);
+    }
+
+    async function getUserId() {
+      const apikey = document.getElementById('apiKeyLookup').value;
+      const key = document.getElementById('adminKey').value;
+
+      const res = await fetch(`/admin/get-user-id?api_key=${encodeURIComponent(apikey)}`, {
+        headers: { 'X-API-KEY': key }
+      });
+
+      const json = await res.json();
+      showResult(json);
+    }
+
+    async function deleteKey() {
+      const userId = document.getElementById('delUserId').value;
+      const key = document.getElementById('adminKey').value;
+
+      const res = await fetch(`/admin/delete-key?user_id=${encodeURIComponent(userId)}`, {
+        method: 'DELETE',
+        headers: { 'X-API-KEY': key }
+      });
+
+      const json = await res.json();
+      showResult(json);
+    }
+  </script>
+</body>
+</html>

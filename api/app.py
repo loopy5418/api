@@ -20,6 +20,7 @@ import uuid
 import psycopg2
 import urllib.parse as up
 import math
+import pyfiglet
 
 start_time = time.time()
 
@@ -883,3 +884,15 @@ def cube_root():
 
     except ValueError:
         return jsonify({'success': False, 'error': 'Invalid number provided'}), 400
+        
+@app.route('/ascii-art', methods=['GET'])
+def ascii_art():
+    text = request.args.get('text', '')
+    if not text:
+        return jsonify({'success': False, 'error': 'Missing text parameter'}), 400
+
+    try:
+        ascii_output = pyfiglet.figlet_format(text)
+        return jsonify({'success': True, 'ascii_art': ascii_output})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

@@ -7,3 +7,4 @@ flask-cors
 qrcode[pil]
 psycopg2-binary
 py-cord[no-voice]
+# force rebuild

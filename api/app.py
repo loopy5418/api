@@ -111,7 +111,7 @@ def checkapikey(key):
     conn.close()
     return result is not None  # Returns True if key exists, False if not
 # API to generate a new key for a user
-@app.route("/generate-key", methods=["POST"])
+@app.route("/admin/generate-key", methods=["POST"])
 def generate_key():
     key = request.headers.get("X-API-KEY")
     if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):
@@ -133,7 +133,7 @@ def generate_key():
 
     return jsonify({"user_id": user_id, "api_key": api_key})
 # API to retrieve an existing key for a user
-@app.route("/get-key", methods=["GET"])
+@app.route("/admin/get-key", methods=["GET"])
 def get_key():
     key = request.headers.get("X-API-KEY")
     if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):
@@ -154,7 +154,7 @@ def get_key():
 
     return jsonify({"user_id": user_id, "api_key": result[0]})
 # API to delete an API key for a user
-@app.route("/delete-key", methods=["DELETE"])
+@app.route("/admin/delete-key", methods=["DELETE"])
 def delete_key():
     key = request.headers.get("X-API-KEY")
     if key not in os.environ.get("ADMIN_API_KEYS", "").split(","):

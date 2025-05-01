@@ -127,7 +127,7 @@ def get_user_id_from_key():
     if not result:
         return jsonify({"error": "API key not found", "success": False}), 404
 
-    return jsonify({"api_key": api_key, "user_id": result[0], "success": False})
+    return jsonify({"api_key": api_key, "user_id": result[0], "success": True})
 
 @app.route("/admin/generate-key", methods=["POST"])
 def generate_key():

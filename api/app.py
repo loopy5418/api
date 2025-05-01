@@ -57,13 +57,11 @@ def restart_heroku_dyno():
 
 class IgnoreSysinfoFilter(logging.Filter):
     def filter(self, record):
-        # Only log if the path is not /sysinfo or /health
         try:
             from flask import request
             path = request.path
             return path not in ["/sysinfo", "/health"]
         except RuntimeError:
-            # Not in a request context
             return True
 
 for handler in app.logger.handlers:
@@ -71,7 +69,6 @@ for handler in app.logger.handlers:
 
 DATABASE = 'api_keys.db'
 
-# Helper function to get the DB connection
 def get_db():
     db_url = os.environ.get("DATABASE_URL")
     if not db_url:
@@ -109,8 +106,8 @@ def checkapikey(key):
     c.execute("SELECT 1 FROM api_keys WHERE api_key = %s", (key,))
     result = c.fetchone()
     conn.close()
-    return result is not None  # Returns True if key exists, False if not
-# API to generate a new key for a user
+    return result is not None
+
 @app.route("/admin/generate-key", methods=["POST"])
 def generate_key():
     key = request.headers.get("X-API-KEY")
@@ -121,7 +118,7 @@ def generate_key():
     user_id = data.get("user_id")
 
     if not user_id:
-        return jsonify({"error": "Missing user_id"}), 400
+        return jsonify({"error": "Missing user_id", "success": False}), 400
 
     api_key = str(uuid.uuid4())
 
@@ -131,8 +128,8 @@ def generate_key():
     conn.commit()
     conn.close()
 
-    return jsonify({"user_id": user_id, "api_key": api_key})
-# API to retrieve an existing key for a user
+    return jsonify({"user_id": user_id, "api_key": api_key, "success": True})
+
 @app.route("/admin/get-key", methods=["GET"])
 def get_key():
     key = request.headers.get("X-API-KEY")
@@ -141,7 +138,7 @@ def get_key():
 
     user_id = request.args.get("user_id")
     if not user_id:
-        return jsonify({"error": "Missing user_id"}), 400
+        return jsonify({"error": "Missing user_id", "success": False}), 400
 
     conn = get_db()
     c = conn.cursor()
@@ -150,10 +147,10 @@ def get_key():
     conn.close()
 
     if not result:
-        return jsonify({"error": "No API key found"}), 404
+        return jsonify({"error": "No API key found", "success": False}), 404
 
-    return jsonify({"user_id": user_id, "api_key": result[0]})
-# API to delete an API key for a user
+    return jsonify({"user_id": user_id, "api_key": result[0], "success": True})
+
 @app.route("/admin/delete-key", methods=["DELETE"])
 def delete_key():
     key = request.headers.get("X-API-KEY")
@@ -162,7 +159,7 @@ def delete_key():
     user_id = request.args.get("user_id")
 
     if not user_id:
-        return jsonify({"error": "Missing user_id"}), 400
+        return jsonify({"error": "Missing user_id", "success": False}), 400
 
     conn = get_db()
     c = conn.cursor()
@@ -170,9 +167,7 @@ def delete_key():
     conn.commit()
     conn.close()
 
-    return jsonify({"message": f"API key for user {user_id} deleted"})
-# Mock admin key validation (already in place)
-
+    return jsonify({"message": f"API key for user {user_id} deleted", "success": True})
 
 @app.route("/")
 def index():

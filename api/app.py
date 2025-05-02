@@ -940,4 +940,15 @@ def ai():
         )
         return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
     except Exception as e:
-        return jsonify({"error": str(e), "success": False}), 500
+        error_msg = str(e)
+        not_found_msg = f"Model {model} not found in any provider."
+        if error_msg == not_found_msg:
+            return jsonify({
+                "error": "That model doesn't exist! See the supported models in the docs.",
+                "success": False
+            }), 400
+        else:
+            return jsonify({
+                "error": error_msg,
+                "success": False
+            }), 500

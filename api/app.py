@@ -908,7 +908,7 @@ def gpt4o():
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
     if not checkapikey(apikey):
         return jsonify({"error": "Invalid API key", "success": False}), 403
-    if not prompt:
+    if not text:
         return jsonify({"error": "Missing 'prompt' parameter", "success": False})
     try:
         r = gptc.chat.completions.create(
@@ -916,7 +916,7 @@ def gpt4o():
             messages=[{"role": "user", "content": text}],
             web_search=websearch
         )
-        return jsonify({"response": r.choices[0].message.content, "success": False})
+        return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
     except Exception as e:
         return jsonify({"error": str(e), "success": False}), 500
         

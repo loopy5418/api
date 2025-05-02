@@ -13,3 +13,4 @@ multidict==6.0.4
 py-cord==2.5.0
 yarl==1.9.2
 pyfiglet
+g4f[all]

@@ -942,9 +942,9 @@ def ai():
         return jsonify({"error": "Invalid 'web_search' value. Must be 'true' or 'false'", "success": False}), 400
     try:
         r = gptc.chat.completions.create(
-            model=f"{modelreq}"
+            model=modelreq,
             messages=[{"role": "user", "content": text}],
-            web_search=f"{websearch}"
+            web_search=websearch
         )
         return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
     except Exception as e:

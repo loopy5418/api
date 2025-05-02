@@ -932,7 +932,7 @@ def ai():
         return jsonify({"error": "Invalid API key", "success": False}), 403
     if not text:
         return jsonify({"error": "Missing 'prompt' parameter", "success": False})
-    if not model:
+    if not modelreq:
         return jsonify({"error": "Missing 'model' parameter", "success": False})
     try:
         r = gptc.chat.completions.create(
@@ -943,7 +943,7 @@ def ai():
         return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
     except Exception as e:
         error_msg = str(e)
-        not_found_msg = f"Model {model} not found in any provider."
+        not_found_msg = f"Model {modelreq} not found in any provider."
         if error_msg == not_found_msg:
             return jsonify({
                 "error": "That model doesn't exist! See the supported models in the docs.",

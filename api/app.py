@@ -925,16 +925,18 @@ def ai():
     text = request.args.get("prompt")
     websearch = request.args.get("web_search", False)
     apikey = request.args.get("key")
+    modelreq = request.args.get("model")
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
     if not checkapikey(apikey):
         return jsonify({"error": "Invalid API key", "success": False}), 403
     if not text:
         return jsonify({"error": "Missing 'prompt' parameter", "success": False})
-    
+    if not model:
+        return jsonify({"error": "Missing 'model' parameter", "success": False})
     try:
         r = gptc.chat.completions.create(
-            model="gpt-suissj4o",
+            model=modelreq
             messages=[{"role": "user", "content": text}],
             web_search=websearch
         )

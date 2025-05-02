@@ -21,6 +21,8 @@ import psycopg2
 import urllib.parse as up
 import math
 import pyfiglet
+from g4f.client import Client
+gptc = Client()
 
 start_time = time.time()
 
@@ -453,7 +455,7 @@ def image_with_text():
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Add 'api_key' parameter to your request body.", "success": False})
     if not checkapikey(apikey):
-        return jsonify({"message": "Invalid API key", "success": False}), 403
+        return jsonify({"error": "Invalid API key", "success": False}), 403
     if not image_url or not text:
         return jsonify({"error": "'image_url' and 'text' are required fields.", "success": False}), 400
 
@@ -528,7 +530,7 @@ def qr_code():
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=api_key_here", "success": False})
     if not checkapikey(apikey):
-        return jsonify({"message": "Invalid API key", "success": False}), 403
+        return jsonify({"error": "Invalid API key", "success": False}), 403
     if not data:
         return jsonify({"error": "Missing 'data' query parameter.", "success": False}), 400
     img = qrcode.make(data)
@@ -549,7 +551,7 @@ def wifi_qr():
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
     if not checkapikey(apikey):
-        return jsonify({"message": "Invalid API key", "success": False}), 403
+        return jsonify({"error": "Invalid API key", "success": False}), 403
     if not ssid:
         return jsonify({"error": "Missing 'ssid' query parameter.", "success": False}), 400
     qr_data = f"WIFI:T:{security};S:{ssid};P:{password};{'H:true;' if hidden else ''};"
@@ -896,3 +898,25 @@ def ascii_art():
         return jsonify({'success': True, 'ascii_art': ascii_output})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+        
+@app.route('/ai/gpt-4o', methods=['GET'])
+def gpt4o():
+    text = request.args.get("prompt")
+    websearch = request.args.get("web_search", false)
+    apikey = request.args.get("key")
+    if not apikey:
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
+    if not checkapikey(apikey):
+        return jsonify({"error": "Invalid API key", "success": False}), 403
+    if not prompt:
+        return jsonify({"error": "Missing 'prompt' parameter", "success": False})
+    try:
+        r = gptc.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": text}],
+            web_search=websearch
+        )
+        return jsonify({"response": r.choices[0].message.content, "success": False})
+    except Exception as e:
+        return jsonify({"error": str(e), "success": False}), 500
+        

@@ -934,9 +934,9 @@ def ai():
         return jsonify({"error": "Missing 'prompt' parameter", "success": False})
     if not modelreq:
         return jsonify({"error": "Missing 'model' parameter", "success": False})
-    if websearch_raw.lower() == "true":
+    if websearch.lower() == "true":
         websearch = True
-    elif websearch_raw.lower() == "false":
+    elif websearch.lower() == "false":
         websearch = False
     else:
         return jsonify({"error": "Invalid 'web_search' value. Must be 'true' or 'false'", "success": False}), 400

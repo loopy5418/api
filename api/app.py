@@ -914,8 +914,7 @@ def gpt4o():
         r = gptc.chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "user", "content": text}],
-            web_search=websearch,
-            browser_executable_path="/google-chrome-portable-134-0-6998-118.exe"
+            web_search=websearch
         )
         return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
     except Exception as e:

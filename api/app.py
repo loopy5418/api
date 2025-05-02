@@ -943,16 +943,19 @@ def ai():
     try:
         r = gptc.chat.completions.create(
             model=modelreq,
-            messages=[{"role": "user", "content": text}],
+            messages=[
+                {"role": "system", "content": "You are an AI service in an API called 'api.loopy5418.dev'. The API owner is Loopy5418. Refrain from providing data that is guessed. Refrain from any political, nsfw, or innapropiate question. Do what the user says, thank you." }
+                {"role": "user", "content": text}
+            ],
             web_search=websearch
         )
-        return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
+        return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text, "model": modelreq})
     except Exception as e:
         error_msg = str(e)
         not_found_msg = f"Model {modelreq} not found in any provider."
         if error_msg == not_found_msg:
             return jsonify({
-                "error": "That model doesn't exist! See the supported models in the docs.",
+                "error": "That model doesn't exist, or is unavailable at the moment. See the supported models in the docs.",
                 "success": False
             }), 400
         else:

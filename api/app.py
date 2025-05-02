@@ -923,7 +923,7 @@ def gpt4o():
 @app.route('/ai', methods=['GET'])
 def ai():
     text = request.args.get("prompt")
-    websearch = request.args.get("web_search", False)
+    websearch = request.args.get("web_search", "false")
     apikey = request.args.get("key")
     modelreq = request.args.get("model")
     if not apikey:
@@ -934,11 +934,17 @@ def ai():
         return jsonify({"error": "Missing 'prompt' parameter", "success": False})
     if not modelreq:
         return jsonify({"error": "Missing 'model' parameter", "success": False})
+    if websearch_raw.lower() == "true":
+        websearch = True
+    elif websearch_raw.lower() == "false":
+        websearch = False
+    else:
+        return jsonify({"error": "Invalid 'web_search' value. Must be 'true' or 'false'", "success": False}), 400
     try:
         r = gptc.chat.completions.create(
-            model=modelreq
+            model=f"{modelreq}"
             messages=[{"role": "user", "content": text}],
-            web_search=websearch
+            web_search=f"{websearch}"
         )
         return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
     except Exception as e:

@@ -700,6 +700,51 @@
 }</code></pre>
       </div>
     </div>
+    
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-ai')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/image-with-text</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-ai" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <p class="text-sm text-gray-500 dark:text-gray-400">This API requires an API key. 100% free.</p>
+                    <h3 class="font-semibold">Supported Models</h3>
+                    <ul class="list-disc pl-6 text-sm mb-4">
+  <li><strong>gpt-4</strong>: GPT-4 from OpenAI</li>
+  <li><strong>gpt-4o</strong>: Multimodal GPT-4 Omni from OpenAI</li>
+  <li><strong>gpt-4o-mini</strong>: Lightweight GPT-4 Omni variant</li>
+  <li><strong>o1</strong>: OpenAI's small model (experimental)</li>
+  <li><strong>o3-mini</strong>: Miniature OpenAI model (possibly under o-series)</li>
+  <li><strong>llama-3.1-8b</strong>: Meta’s LLaMA 3.1 model</li>
+  <li><strong>llama-3.1-70b</strong>: Meta’s LLaMA 3.1 model</li>
+  <li><strong>llama-3.2-11b</strong>: Hypothetical LLaMA 3.2</li>
+  <li><strong>llama-3.3-70b</strong>: Hypothetical LLaMA 3.3</li>
+  <li><strong>gemini-1.5-pro</strong>: Google’s Gemini 1.5 Pro model</li>
+  <li><strong>gemini-2.0-flash</strong>: Google’s lightweight Gemini 2.0 Flash variant</li>
+  <li><strong>deepseek-v3</strong>: DeepSeek's version 3 LLM</li>
+  <li><strong>deepseek-r1</strong>: DeepSeek's first research-focused model</li>
+</ul>
+<h3 class="font-semibold">Query Parameters</h3>
+                    <ul class="list-disc pl-6 text-sm mb-4">
+  <li><strong>model</strong>: The model of the AI you want to use. See supported models above. (required)</li>
+  <li><strong>web_search</strong>: Use the web search feature to get the latest information online. Some of the models do not support this. (optional, defaults to false)</li>
+  <li><strong>prompt</strong>: The prompt you want to send the AI. (required)</li>
+  <li><strong>key</strong>: Your API key. You can get one from our Discord server by pressing the Discord button above (required)</li>
+</ul>
+<h3 class="font-semibold">Example URL</h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/ai?prompt=Get+the+latest+news+in+Europe&model=gpt-4o&web_search=true</p>
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "success": true,
+  "model": "gpt-4o",
+  "response": "Hello! How may I assist you today?",
+  "prompt": "Get the latest news in Europe"
+}</code></pre>
+        </div>
+      </div>
   </main>
 </body>
 </html>

@@ -944,7 +944,7 @@ def ai():
         r = gptc.chat.completions.create(
             model=modelreq,
             messages=[
-                {"role": "system", "content": "You are an AI service in an API called 'api.loopy5418.dev'. The API owner is Loopy5418. Refrain from providing data that is guessed. Refrain from any political, nsfw, or innapropiate question. Do what the user says, thank you." }
+                {"role": "system", "content": "You are an AI service in an API called 'api.loopy5418.dev'. The API owner is Loopy5418. Refrain from providing data that is guessed. Refrain from any political, nsfw, or innapropiate question. Do what the user says, thank you." },
                 {"role": "user", "content": text}
             ],
             web_search=websearch

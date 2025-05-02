@@ -902,7 +902,7 @@ def ascii_art():
 @app.route('/ai/gpt-4o', methods=['GET'])
 def gpt4o():
     text = request.args.get("prompt")
-    websearch = request.args.get("web_search", false)
+    websearch = request.args.get("web_search", False)
     apikey = request.args.get("key")
     if not apikey:
         return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})

@@ -22,6 +22,7 @@ import urllib.parse as up
 import math
 import pyfiglet
 from g4f.client import Client
+import asyncio
 gptc = Client()
 
 start_time = time.time()
@@ -967,17 +968,23 @@ def ai():
 @app.route('/aitesting123', methods=['GET'])
 def aitesting():
     prompt = request.args.get("prompt")
-    stream = gptc.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        stream=True,
-        web_search = False
-    )
-    for chunk in stream:
-        if chunk.choices[0].delta.content:
-            print(chunk.choices[0].delta.content or "", end="")
+
+    def generate():
+        stream = gptc.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            stream=True,
+            # remove this if not supported:
+            # web_search=False
+        )
+        for chunk in stream:
+            content = chunk.choices[0].delta.get('content')
+            if content:
+                yield content
+
+    return Response(generate(), mimetype='text/plain')

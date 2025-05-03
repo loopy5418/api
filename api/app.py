@@ -963,3 +963,21 @@ def ai():
                 "error": error_msg,
                 "success": False
             }), 500
+            
+@app.route('/aitesting123', methods=['GET'])
+def aitesting():
+    prompt = request.args.get("prompt")
+    stream = gptc.chat.completions.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        stream=True,
+        web_search = False
+    )
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            print(chunk.choices[0].delta.content or "", end="")

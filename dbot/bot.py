@@ -5,46 +5,114 @@ from discord.ext import commands
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-LOG_CHANNEL_ID = 1365259997365272699
+ADMIN_ROLE_ID = 1365260451956396082
 
-@bot.event
-async def on_member_remove(member: discord.Member):
-    admin_api_keys = os.getenv("ADMIN_API_KEYS")
-    if not admin_api_keys:
-        print("ADMIN_API_KEYS not set — cannot delete API key.")
+async def check_api_up(session):
+    try:
+        async with session.get("https://api.loopy5418.dev/health") as health_resp:
+            return (await health_resp.text()).strip() == "OK"
+    except:
+        return False
+
+def get_admin_api_key():
+    keys = os.getenv("ADMIN_API_KEYS")
+    return keys.split(",")[0] if keys else None
+
+def is_admin(interaction: discord.ApplicationContext):
+    return any(role.id == ADMIN_ROLE_ID for role in interaction.author.roles)
+
+@bot.slash_command(name="admin-key-revoke", description="(ADMIN ONLY) Revoke a user's API key.")
+async def key_revoke(ctx: discord.ApplicationContext, user: discord.Member):
+    if not is_admin(ctx):
+        await ctx.respond("You don't have permission to use this command.", ephemeral=True)
         return
 
-    admin_key = admin_api_keys.split(",")[0]
-    user_id_str = str(member.id)
-
-    headers = {
-        "X-API-KEY": admin_key
-    }
-
-    url = f"https://api.loopy5418.dev/admin/delete-key?user_id={user_id_str}"
-
-    log_channel = bot.get_channel(LOG_CHANNEL_ID)
-
+    await ctx.defer()
     async with aiohttp.ClientSession() as session:
-        try:
-            async with session.delete(url, headers=headers) as resp:
-                data = await resp.json()
-                if data.get("success"):
-                    message = f"Deleted API key for user `{user_id_str}` ({member})"
-                else:
-                    message = f"Failed to delete key for `{user_id_str}`: {data.get('message')}"
+        if not await check_api_up(session):
+            await ctx.respond("The API is currently down.")
+            return
 
-        except Exception as e:
-            message = f"Error deleting API key for `{user_id_str}`: {e}"
+        api_key = get_admin_api_key()
+        if not api_key:
+            await ctx.respond("Missing ADMIN_API_KEYS configuration.")
+            return
 
-        if log_channel:
-            await log_channel.send(message)
-        else:
-            print("Log channel not found.")
-            print(message)
+        url = f"https://api.loopy5418.dev/admin/delete-key?user_id={user.id}"
+        headers = {"X-API-KEY": api_key}
+
+        async with session.delete(url, headers=headers) as resp:
+            data = await resp.json()
+            if data.get("success"):
+                await ctx.respond(f"Revoked API key for {user.mention}.")
+            else:
+                await ctx.respond(f"Failed to revoke key: {data.get('message')}")
+
+# /key-generate command
+@bot.slash_command(name="admin-key-generate", description="(ADMIN ONLY) Generate a user's API key.")
+async def key_generate(ctx: discord.ApplicationContext, user: discord.Member):
+    if not is_admin(ctx):
+        await ctx.respond("You don't have permission to use this command.", ephemeral=True)
+        return
+
+    await ctx.defer()
+    async with aiohttp.ClientSession() as session:
+        if not await check_api_up(session):
+            await ctx.respond("The API is currently down.")
+            return
+
+        api_key = get_admin_api_key()
+        if not api_key:
+            await ctx.respond("Missing ADMIN_API_KEYS configuration.")
+            return
+
+        url = "https://api.loopy5418.dev/admin/generate-key"
+        headers = {
+            "X-API-KEY": api_key,
+            "Content-Type": "application/json"
+        }
+        payload = { "user_id": str(user.id) }
+
+        async with session.post(url, json=payload, headers=headers) as resp:
+            data = await resp.json()
+            if data.get("success"):
+                await ctx.respond(f"Generated API key for {user.mention}: `{data['api_key']}`")
+            elif data.get("error") == "API Key for this user already exists":
+                await ctx.respond(f"{user.mention} already has an API key: `{data['api_key']}`")
+            else:
+                await ctx.respond(f"Failed to generate key: {data.get('error')}")
+
+# /key-get command
+@bot.slash_command(name="admin-key-get", description="(ADMIN ONLY) Get a user's API key.")
+async def key_get(ctx: discord.ApplicationContext, user: discord.Member):
+    if not is_admin(ctx):
+        await ctx.respond("You don't have permission to use this command.", ephemeral=True)
+        return
+
+    await ctx.defer()
+    async with aiohttp.ClientSession() as session:
+        if not await check_api_up(session):
+            await ctx.respond("The API is currently down.")
+            return
+
+        api_key = get_admin_api_key()
+        if not api_key:
+            await ctx.respond("Missing ADMIN_API_KEYS configuration.")
+            return
+
+        url = f"https://api.loopy5418.dev/admin/get-key?user_id={user.id}"
+        headers = {"X-API-KEY": api_key}
+
+        async with session.get(url, headers=headers) as resp:
+            data = await resp.json()
+            if data.get("success"):
+                await ctx.respond(f"{user.mention}'s API key: `{data['api_key']}`")
+            else:
+                await ctx.respond(f"Failed to get key: {data.get('message')}")
 
 # Cooldown setup: max 1 command per 60 seconds per user
 @bot.slash_command(name="get-api-key", description="Generate your API key.")

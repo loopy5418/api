@@ -8,6 +8,43 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+LOG_CHANNEL_ID = 1365259997365272699
+
+@bot.event
+async def on_member_remove(member: discord.Member):
+    admin_api_keys = os.getenv("ADMIN_API_KEYS")
+    if not admin_api_keys:
+        print("ADMIN_API_KEYS not set — cannot delete API key.")
+        return
+
+    admin_key = admin_api_keys.split(",")[0]
+    user_id_str = str(member.id)
+
+    headers = {
+        "X-API-KEY": admin_key
+    }
+
+    url = f"https://api.loopy5418.dev/admin/delete-key?user_id={user_id_str}"
+
+    log_channel = bot.get_channel(LOG_CHANNEL_ID)
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.delete(url, headers=headers) as resp:
+                data = await resp.json()
+                if data.get("success"):
+                    message = f"Deleted API key for user `{user_id_str}` ({member})"
+                else:
+                    message = f"Failed to delete key for `{user_id_str}`: {data.get('message')}"
+
+        except Exception as e:
+            message = f"Error deleting API key for `{user_id_str}`: {e}"
+
+        if log_channel:
+            await log_channel.send(message)
+        else:
+            print("Log channel not found.")
+            print(message)
 
 # Cooldown setup: max 1 command per 60 seconds per user
 @bot.slash_command(name="get-api-key", description="Generate your API key.")

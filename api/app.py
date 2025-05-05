@@ -1020,7 +1020,7 @@ def roblox_user_info():
 
     # Step 1: Resolve username to user ID if needed
     if username:
-        search_url = f"https://users.roproxy.com/v1/users/search?keyword={username}&limit=5"
+        search_url = f"https://users.roproxy.com/v1/users/search?keyword={username}&limit=25"
         try:
             search_response = requests.get(search_url)
             search_response.raise_for_status()

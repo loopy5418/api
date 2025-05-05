@@ -775,6 +775,88 @@
 }</code></pre>
         </div>
       </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-robloxsearch')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/roblox-user-search</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-robloxsearch" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <p class="text-sm text-gray-500 dark:text-gray-400">This API requires an API key. 100% free.</p>
+<h3 class="font-semibold">Query Parameters</h3>
+                    <ul class="list-disc pl-6 text-sm mb-4">
+  <li><strong>username</strong>: The username of the person you want to search (required)</li>
+  <li><strong>key</strong>: Your API key. Get one in the Discord server. (required)</li>
+</ul>
+<h3 class="font-semibold">Example URL</h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/roblox-user-search?username=roblox&key=yourapikey</p>
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "results": [
+    {
+      "displayName": "Roblox",
+      "hasVerifiedBadge": true,
+      "id": 1,
+      "name": "Roblox",
+      "previousUsernames": []
+    },
+    {
+      "displayName": "Roblox Roblox",
+      "hasVerifiedBadge": false,
+      "id": 8376235114,
+      "name": "Roblox0013410",
+      "previousUsernames": []
+    } // it will display a lot more user info, i shortened it here (max 25 results)
+  ],
+  "total": 2,
+  "success": true
+}</code></pre>
+        </div>
+      </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-robloxinfo')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/roblox-user-search</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-robloxinfo" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <p class="text-sm text-gray-500 dark:text-gray-400">This API requires an API key. 100% free.</p>
+<h3 class="font-semibold">Query Parameters</h3>
+                    <ul class="list-disc pl-6 text-sm mb-4">
+  <li><strong>username</strong>: The username of the person you want to get the info of (optional)</li>
+  <li><strong>user_id</strong>: The user ID of the person you want to get the info of (optional)</li>
+  <li><strong>key</strong>: Your API key. Get one in the Discord server. (required)</li>
+  <li><strong>You must provide wither username, or user_id. But never both.</strong></li>
+</ul>
+<h3 class="font-semibold">Example URL</h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/roblox-user-info?username=roblox&key=yourapikey</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/roblox-user-info?user_id=1&key=yourapikey</p>
+        <h3 class="font-semibold">Response Preview</h3>
+        <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "created": {
+    "date": "February 27, 2006",
+    "day": 27,
+    "month": "February",
+    "time": "21:06",
+    "year": 2006
+  },
+  "description": "Welcome to the Roblox profile! This is where you can check out the newest items in the catalog, and get a jumpstart on exploring and building on our Imagination Platform. If you want news on updates to the Roblox platform, or great new experiences to play with friends, check out blog.roblox.com. Please note, this is an automated account. If you need to reach Roblox for any customer service needs find help at www.roblox.com/help",
+  "displayName": "Roblox",
+  "externalAppDisplayName": null,
+  "hasVerifiedBadge": true,
+  "id": 1,
+  "isBanned": false,
+  "name": "Roblox",
+  "success": true
+}</code></pre>
+        </div>
+      </div>
   </main>
 </body>
 </html>

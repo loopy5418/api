@@ -997,7 +997,7 @@ def roblox_user_search():
 @app.route('/roblox-user-info', methods=['GET'])
 def roblox_user_info():
     apikey = request.args.get("key")
-    if not apikey: # 1000th line!!! 
+    if not apikey: # 1000th line!!!
         return jsonify({
             "error": "Missing API key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere",
             "success": False
@@ -1018,33 +1018,62 @@ def roblox_user_info():
             "success": False
         }), 400
 
-    # Step 1: Resolve username to user ID if needed
+    # Step 1: Get user_id from username if needed
     if username:
-        search_url = f"https://users.roproxy.com/v1/users/search?keyword={username}&limit=25"
         try:
+            search_url = f"https://users.roproxy.com/v1/users/search?keyword={username}&limit=25"
             search_response = requests.get(search_url)
             search_response.raise_for_status()
             search_data = search_response.json().get("data", [])
             if not search_data:
                 return jsonify({"error": "User not found", "success": False}), 404
-            user_id = search_data[0].get("id")
+            user_id = search_data[0]["id"]
         except requests.RequestException as e:
-            return jsonify({"error": "Failed to search user", "details": str(e), "success": False}), 500
+            return jsonify({
+                "error": "Failed to search user",
+                "success": False
+            }), 500
 
     # Step 2: Fetch user info
-    user_info_url = f"https://users.roproxy.com/v1/users/{user_id}"
     headers = {
         "x-api-key": os.environ.get("ROBLOX_API_KEY", "")
     }
 
     if not headers["x-api-key"]:
-        return jsonify({"error": "ROBLOX_API_KEY not set in environment", "success": False}), 500
+        return jsonify({
+            "error": "ROBLOX_API_KEY not set in environment",
+            "success": False
+        }), 500
 
     try:
+        user_info_url = f"https://users.roproxy.com/v1/users/{user_id}"
         user_info_response = requests.get(user_info_url, headers=headers)
         user_info_response.raise_for_status()
         user_data = user_info_response.json()
+
+        # Format "created" timestamp
+        created_raw = user_data.get("created")
+        if created_raw:
+            try:
+                dt = datetime.strptime(created_raw, "%Y-%m-%dT%H:%M:%S.%fZ")
+                user_data["created"] = {
+                    "day": dt.day,
+                    "year": dt.year,
+                    "month": dt.strftime("%B"),
+                    "date": dt.strftime("%B %d, %Y"),
+                    "time": dt.strftime("%H:%M")
+                }
+            except ValueError:
+                user_data["created"] = {
+                    "raw": created_raw,
+                    "error": "Invalid date format"
+                }
+
         user_data["success"] = True
         return jsonify(user_data)
+
     except requests.RequestException as e:
-        return jsonify({"error": "Failed to fetch user info", "details": str(e), "success": False}), 500
+        return jsonify({
+            "error": "Failed to fetch user info",
+            "success": False
+        }), 500

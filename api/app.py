@@ -964,27 +964,87 @@ def ai():
                 "error": error_msg,
                 "success": False
             }), 500
-            
-@app.route('/aitesting123', methods=['GET'])
-def aitesting():
-    prompt = request.args.get("prompt")
 
-    def generate():
-        stream = gptc.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            stream=True,
-            # remove this if not supported:
-            # web_search=False
-        )
-        for chunk in stream:
-            content = chunk.choices[0].delta.get('content')
-            if content:
-                yield content
+@app.route('/roblox-user-search', methods=['GET'])
+def roblox_user_search():
+    username = request.args.get('username')
+    apikey = request.args.get("key")
+    if not apikey:
+        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
+    if not checkapikey(apikey):
+        return jsonify({"error": "Invalid API key", "success": False}), 403
+    if not username:
+        return jsonify({"error": "Missing 'username' parameter", "success": False}), 400
 
-    return Response(generate(), mimetype='text/plain')
+    roproxy_url = f"https://users.roproxy.com/v1/users/search?keyword={username}&limit=25"
+
+    try:
+        response = requests.get(roproxy_url)
+        response.raise_for_status()
+        data = response.json()
+
+        results = data.get("data", [])
+        return jsonify({
+            "results": results,
+            "total": len(results),
+            "success": True
+        })
+
+    except requests.RequestException as e:
+        return jsonify({"error": "Failed to fetch data from Roblox servers: str(e)", "success": False}), 500
+        
+
+@app.route('/roblox-user-info', methods=['GET'])
+def roblox_user_info():
+    apikey = request.args.get("key")
+    if not apikey: # 1000th line!!! 
+        return jsonify({
+            "error": "Missing API key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere",
+            "success": False
+        }), 400
+
+    if not checkapikey(apikey):
+        return jsonify({
+            "error": "Invalid API key",
+            "success": False
+        }), 403
+
+    username = request.args.get('username')
+    user_id = request.args.get('user_id')
+
+    if (username and user_id) or (not username and not user_id):
+        return jsonify({
+            "error": "Provide either 'username' or 'user_id', but not both",
+            "success": False
+        }), 400
+
+    # Step 1: Resolve username to user ID if needed
+    if username:
+        search_url = f"https://users.roproxy.com/v1/users/search?keyword={username}&limit=1"
+        try:
+            search_response = requests.get(search_url)
+            search_response.raise_for_status()
+            search_data = search_response.json().get("data", [])
+            if not search_data:
+                return jsonify({"error": "User not found", "success": False}), 404
+            user_id = search_data[0].get("id")
+        except requests.RequestException as e:
+            return jsonify({"error": "Failed to search user", "details": str(e), "success": False}), 500
+
+    # Step 2: Fetch user info
+    user_info_url = f"https://users.roproxy.com/v1/users/{user_id}"
+    headers = {
+        "x-api-key": os.environ.get("ROBLOX_API_KEY", "")
+    }
+
+    if not headers["x-api-key"]:
+        return jsonify({"error": "ROBLOX_API_KEY not set in environment", "success": False}), 500
+
+    try:
+        user_info_response = requests.get(user_info_url, headers=headers)
+        user_info_response.raise_for_status()
+        user_data = user_info_response.json()
+        user_data["success"] = True
+        return jsonify(user_data)
+    except requests.RequestException as e:
+        return jsonify({"error": "Failed to fetch user info", "details": str(e), "success": False}), 500

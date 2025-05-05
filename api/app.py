@@ -1069,6 +1069,13 @@ def roblox_user_info():
                     "error": "Invalid date format"
                 }
 
+        # Step 3: Fetch profile picture
+        thumb_url = f"https://apis.roproxy.com/cloud/v2/users/{user_id}:generateThumbnail?size=100&format=PNG&shape=ROUND"
+        thumb_response = requests.get(thumb_url, headers=headers)
+        if thumb_response.ok:
+            thumb_data = thumb_response.json()
+            user_data["profile_picture_url"] = thumb_data.get("response", {}).get("imageUri")
+
         user_data["success"] = True
         return jsonify(user_data)
 

@@ -1087,7 +1087,7 @@ def roblox_user_info():
         
 @app.route('/try/roblox-user-search')
 def robloxsearchtry():
-    return render_template('try/r-user-search.html.')
+    return render_template('try/r-user-search.html')
     
 @app.route('/try/roblox-search-info')
 def robloxsearchinfotry():

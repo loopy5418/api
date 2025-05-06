@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors">
+<head>
+  <meta charset="UTF-8">
+  <title>Roblox User Search - API Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .border-light {
+      border: 1.5px solid #474a51 !important;
+    }
+    .rounded-xl {
+      border-radius: 1rem !important;
+    }
+    body, .bg-main {
+      background: #181c20 !important;
+    }
+    .text-main {
+      color: #e5e7eb !important;
+    }
+    .input-main {
+      background: #23272e !important;
+      color: #e5e7eb !important;
+      border: 1px solid #474a51 !important;
+    }
+    .input-main:focus {
+      outline: 2px solid #3b82f6;
+    }
+    .text-green-400 { color: #4ade80 !important; }
+    .text-red-400 { color: #f87171 !important; }
+    .bg-yellow-500 { background: #eab308 !important; }
+    .bg-yellow-600 { background: #ca8a04 !important; }
+  </style>
+  <script>
+    async function searchRobloxUser() {
+      const apiKey = document.getElementById('api-key').value.trim();
+      const keyword = document.getElementById('roblox-username').value.trim();
+      const resultContainer = document.getElementById('results');
+      const status = document.getElementById('status');
+
+      resultContainer.innerHTML = '';
+      status.textContent = '';
+
+      if (!apiKey || !keyword) {
+        status.textContent = "❌ API key and username are required.";
+        status.className = "text-red-400 mt-2";
+        return;
+      }
+
+      const encodedKeyword = encodeURIComponent(keyword);
+      const url = `https://api.loopy5418.dev/roblox-user-search?username=${encodedKeyword}&key=${apiKey}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.success) {
+          status.textContent = `❌ ${data.error || "Unknown error"}`;
+          status.className = "text-red-400 mt-2";
+          return;
+        }
+
+        if (data.total === 0 || !data.results || data.results.length === 0) {
+          status.textContent = "⚠️ No users found.";
+          status.className = "text-yellow-500 mt-2";
+          return;
+        }
+
+        status.textContent = `✅ Found ${data.total} user(s)`;
+        status.className = "text-green-400 mt-2";
+
+        data.results.forEach(user => {
+          const badge = user.hasVerifiedBadge ? '✔️' : '';
+          const el = document.createElement('div');
+          el.className = "border-light rounded-xl p-4 mt-3";
+          el.innerHTML = `
+            <div><strong>Display Name:</strong> ${user.displayName} ${badge}</div>
+            <div><strong>Username:</strong> ${user.name}</div>
+            <div><strong>User ID:</strong> ${user.id}</div>
+            <button onclick="viewUserInfo(${user.id})" class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-1 mt-2 rounded">See Info</button>
+          `;
+          resultContainer.appendChild(el);
+        });
+      } catch (e) {
+        status.textContent = "❌ Network error.";
+        status.className = "text-red-400 mt-2";
+      }
+    }
+    
+    function viewUserInfo(userId) {
+  const apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) {
+    alert("API key required.");
+    return;
+  }
+  sessionStorage.setItem("selectedUserId", userId);
+  sessionStorage.setItem("apiKey", apiKey);
+  window.location.href = "/try/user-info.html";
+}
+  </script>
+</head>
+<body class="bg-main text-main min-h-screen">
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 shadow bg-main">
+    <div class="flex items-center space-x-4">
+      <span class="text-2xl font-bold tracking-tight">Loopy API Playground</span>
+      <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">v1</span>
+    </div>
+    <div class="mt-4 md:mt-0 ml-0 md:ml-6">
+      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-2 rounded transition">← Return to Index</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-2xl mx-auto flex flex-col gap-8 px-4 mt-6">
+    <section class="rounded-xl p-6 border-light">
+      <h2 class="text-xl font-semibold mb-4">Roblox Username Search</h2>
+
+      <div class="mb-4">
+        <label for="api-key" class="block mb-1 font-medium">API Key</label>
+        <input id="api-key" type="password" class="input-main w-full p-2 rounded-lg" placeholder="Enter your API key">
+      </div>
+
+      <div class="mb-4">
+        <label for="roblox-username" class="block mb-1 font-medium">Enter a Roblox username</label>
+        <div class="flex gap-2">
+          <input id="roblox-username" type="text" class="input-main w-full p-2 rounded-lg" placeholder="e.g., Roblox">
+          <button onclick="searchRobloxUser()" class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg">Search</button>
+        </div>
+      </div>
+
+      <div id="status" class="mt-2"></div>
+      <div id="results" class="mt-4"></div>
+    </section>
+  </main>
+</body>
+</html>

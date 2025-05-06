@@ -433,7 +433,8 @@ def currency_converter():
             "amount": amount,
             "converted": data["rates"][target.upper()],
             "date": data["date"],
-            "success": True
+            "success": True,
+            "note": "This information is from Frankfurter API. Full credits to them."
         })
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}", "success": False}), 500

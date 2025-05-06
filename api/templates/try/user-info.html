@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors">
+<head>
+  <meta charset="UTF-8">
+  <title>User Info - Loopy API Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .border-light { border: 1.5px solid #474a51 !important; }
+    .rounded-xl { border-radius: 1rem !important; }
+    body, .bg-main { background: #181c20 !important; }
+    .text-main { color: #e5e7eb !important; }
+    .bg-yellow-500 { background: #eab308 !important; }
+    .bg-yellow-600 { background: #ca8a04 !important; }
+    .text-green-400 { color: #4ade80 !important; }
+    .text-red-400 { color: #f87171 !important; }
+  </style>
+</head>
+<body class="bg-main text-main min-h-screen">
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row items-center justify-between py-6 px-8 shadow bg-main">
+    <div class="flex items-center space-x-4">
+      <span class="text-2xl font-bold tracking-tight">Loopy API Playground</span>
+      <span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">v1</span>
+    </div>
+    <div class="mt-4 md:mt-0">
+      <a href="/" class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-2 rounded transition">← Return to Index</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <section class="rounded-xl p-6 border-light relative">
+  <div class="relative">
+    <div class="absolute top-0 right-0">
+      <img id="pfp" class="w-24 h-24 rounded-full border border-gray-600" src="" alt="Profile Picture">
+    </div>
+    <div id="user-info" class="space-y-2 pr-28 pt-1"></div>
+  </div>
+  <div id="status" class="mt-4"></div>
+  <div class="mt-6">
+    <a href="/try/r-user-search.html" class="bg-yellow-500 hover:bg-yellow-600 text-black px-3 py-2 rounded transition">← Back to Search</a>
+  </div>
+</section>
+  </main>
+
+  <script>
+    async function fetchUserInfo() {
+      const userId = sessionStorage.getItem("selectedUserId");
+      const apiKey = sessionStorage.getItem("apiKey");
+
+      const status = document.getElementById('status');
+      const info = document.getElementById('user-info');
+      const pfp = document.getElementById('pfp');
+
+      if (!userId || !apiKey) {
+        status.textContent = "❌ Missing user ID or API key.";
+        status.className = "text-red-400";
+        return;
+      }
+
+      try {
+        const url = new URL("https://api.loopy5418.dev/roblox-user-info");
+        url.searchParams.append("user_id", userId);
+        url.searchParams.append("key", apiKey);
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.success) {
+          status.textContent = `❌ ${data.error || "Error fetching user info"}`;
+          status.className = "text-red-400";
+          return;
+        }
+
+        status.textContent = "✅ User info loaded.";
+        status.className = "text-green-400";
+
+        pfp.src = data.profile_picture_url;
+
+        info.innerHTML = `
+          <div><strong>Display Name:</strong> ${data.displayName}</div>
+          <div><strong>Username:</strong> ${data.name}</div>
+          <div><strong>User ID:</strong> ${data.id}</div>
+          <div><strong>Verified Badge:</strong> <span class="${data.hasVerifiedBadge ? 'text-green-400' : 'text-red-400'}">${data.hasVerifiedBadge ? "Yes" : "No"}</span></div>
+          <div><strong>Banned:</strong> <span class="${data.isBanned ? 'text-red-400' : 'text-green-400'}">${data.isBanned ? "Yes" : "No"}</span></div>
+          <div><strong>Account Created:</strong> ${data.created.date} at ${data.created.time}</div>
+          <div><strong>Description:</strong><br><pre class="whitespace-pre-wrap mt-1 bg-gray-800 p-3 rounded">${data.description || "(no description)"}</pre></div>
+        `;
+      } catch (err) {
+        status.textContent = "❌ Network error.";
+        status.className = "text-red-400";
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchUserInfo);
+  </script>
+</body>
+</html>

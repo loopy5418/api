@@ -123,7 +123,7 @@ def checkapikey(key):
     conn.close()
     return result is not None
 
-@app.route('/api-news', methods=['GET', 'POST'])
+@app.route('/admin/update-news', methods=['GET', 'POST'])
 def manage_news():
     if request.method == 'GET':
         conn = get_db()

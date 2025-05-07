@@ -23,6 +23,10 @@ import math
 import pyfiglet
 from g4f.client import Client
 import asyncio
+import calendar
+from dateutil import parser
+import pytz
+
 gptc = Client()
 
 start_time = time.time()
@@ -1093,3 +1097,43 @@ def robloxsearchtry():
 @app.route('/try/roblox-search-info')
 def robloxsearchinfotry():
     return render_template('try/user-info.html')
+
+@app.route('/parse-iso8601', methods=['POST'])
+def parse_timestamp():
+    data = request.get_json()
+    iso_timestamp = data.get('timestamp')
+
+    if not iso_timestamp:
+        return jsonify({"success": False, "error": "Missing 'timestamp' in request"}), 400
+
+    try:
+        dt = parser.isoparse(iso_timestamp)
+
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=pytz.UTC)
+
+        dt = dt.astimezone(pytz.UTC)
+
+        formatted = {
+            "success": True,
+            "year": dt.year,
+            "leap_year": calendar.isleap(dt.year),
+            "month": {
+                "number": dt.month,
+                "name": dt.strftime("%B")
+            },
+            "day": dt.day,
+            "weekday": dt.strftime("%A"),
+            "time": {
+                "hour": dt.hour,
+                "minute": dt.minute,
+                "second": dt.second
+            },
+            "timezone": dt.tzname(),
+            "utc_offset": dt.strftime("%z")
+        }
+
+        return jsonify(formatted)
+
+    except ValueError:
+        return jsonify({"success": False, "error": "Invalid ISO 8601 timestamp format"}), 400

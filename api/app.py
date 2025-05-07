@@ -1112,13 +1112,12 @@ def robloxsearchtry():
 def robloxsearchinfotry():
     return render_template('try/user-info.html')
 
-@app.route('/parse-iso8601', methods=['POST'])
+@app.route('/parse-iso8601', methods=['GET'])
 def parse_timestamp():
-    data = request.get_json()
-    iso_timestamp = data.get('timestamp')
+    iso_timestamp = request.args.get('timestamp')
 
     if not iso_timestamp:
-        return jsonify({"success": False, "error": "Missing 'timestamp' in request"}), 400
+        return jsonify({"success": False, "error": "Missing 'timestamp' query parameter"}), 400
 
     try:
         dt = parser.isoparse(iso_timestamp)

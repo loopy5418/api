@@ -104,6 +104,12 @@ def init_db():
             api_key TEXT NOT NULL
         )
     ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS site_news (
+            id SERIAL PRIMARY KEY,
+            content TEXT
+        )
+    ''')
     conn.commit()
     conn.close()
 with app.app_context():
@@ -116,6 +122,34 @@ def checkapikey(key):
     result = c.fetchone()
     conn.close()
     return result is not None
+
+@app.route('/api-news', methods=['GET', 'POST'])
+def manage_news():
+    if request.method == 'GET':
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT content FROM site_news WHERE id = 1")
+        row = c.fetchone()
+        conn.close()
+        return jsonify({"content": row[0] if row else ""})
+
+    # POST (create/update or delete if empty)
+    is_admin()  # Validate using admin API key
+    data = request.get_json()
+    content = data.get('content', '').strip()
+
+    conn = get_db()
+    c = conn.cursor()
+
+    if content:
+        c.execute("INSERT INTO site_news (id, content) VALUES (1, %s) ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content", (content,))
+    else:
+        c.execute("DELETE FROM site_news WHERE id = 1")
+
+    conn.commit()
+    conn.close()
+    return jsonify({"success": True})
+    
 
 @app.route("/admin/get-user-id", methods=["GET"])
 def get_user_id_from_key():
@@ -215,38 +249,16 @@ def index():
     user_agent = request.headers.get('User-Agent', '').lower()
     discord_invite = os.environ.get("DISCORD_INVITE", "#")
     if "mozilla" in user_agent or "chrome" in user_agent or "safari" in user_agent:
-        return render_template("index.html", discord_invite=discord_invite)
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT content FROM site_news WHERE id = 1")
+        news_row = c.fetchone()
+        conn.close()
+
+        news = news_row[0] if news_row else None
+        return render_template("index.html", discord_invite=discord_invite, news=news)
     else:
-        return jsonify({
-        "base_url": "https://api.loopy5418.dev",
-        "endpoints": {
-            "/": "Index page",
-            "/health": "Health check endpoint",
-            "/seconds-to-time?seconds": "Converts seconds into hh:mm:ss (requires query params)",
-            "/sysinfo": "System info (CPU, RAM, Disk, etc.)",
-            "/utc-time": "Returns a wealthy amount of information about the current UTC time.",
-            "/random-number?minimum=&maximum=": "Generates a random number between the minimum and maximum values (requires query params)",
-            "/base64-encrypt": "Encrypts a text with base64",
-            "/base64-decrypt": "Decrypts a text with base64",
-            "/hash-generator": "Generates a hash for the provided data using the specified algorithm (default: sha256)",
-            "/uuid-generator": "Generates a random UUID",
-            "/image-with-text": "Generates an image with text overlay (requires POST data)",
-            "/currency-converter": "Converts an amount from one currency to another (requires query params)",
-            "/qr": "Generates a QR code from the provided data (requires query params)",
-            "/emojify": "Converts text to emoji representation (requires query params)",
-            "/owoify": "Converts text to owo representation (requires query params)",
-            "/choose": "Randomly chooses an option from a comma-separated list (requires query params)",
-            "/wifi-qr": "Generates a WiFi QR code from ssid, password, security, and hidden query parameters.",
-            "/webhook-send": "Sends a message to a Discord webhook (requires POST data)",
-            "/reverse": "Reverses a text string. (requires query params)",
-            "/generate-password": "Generates a password with the specified length. (requires query params)",
-            "/convert-timezone": "Converts a time from a specific timezone to a specific timezone."
-        },
-        "support": {
-            "discord": f"{discord_invite}",
-        },
-        "note": "This API supports both browser and direct HTTP requests"
-    })
+        return jsonify({"status": True, "discord": f"{discord_invite}"})
 
 
 @app.route("/health")

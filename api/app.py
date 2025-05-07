@@ -26,6 +26,7 @@ import asyncio
 import calendar
 from dateutil import parser
 import pytz
+import markdown
 
 gptc = Client()
 
@@ -255,8 +256,9 @@ def index():
         news_row = c.fetchone()
         conn.close()
 
-        news = news_row[0] if news_row else None
-        return render_template("index.html", discord_invite=discord_invite, news=news)
+        raw_news = news_row[0] if news_row else None
+        news_html = markdown.markdown(raw_news) if raw_news else None
+        return render_template("index.html", discord_invite=discord_invite, news=news_html)
     else:
         return jsonify({"status": True, "discord": f"{discord_invite}"})
 

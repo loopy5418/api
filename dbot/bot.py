@@ -203,13 +203,19 @@ async def on_ready():
 async def ping(ctx):
     await ctx.send('Pong!')
     
+from datetime import datetime, timezone
+
 @bot.command(name="updatenews")
-async def update_news(ctx, *, content: str):
+async def update_news_cmd(ctx, *, content: str):
     if not any(role.id == ADMIN_ROLE_ID for role in ctx.author.roles):
         await ctx.send("You don't have permission to use this command.")
         return
 
     await ctx.trigger_typing()
+
+    # Get current UTC time in readable format
+    utc_now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    content_with_timestamp = f"{content.rstrip()}\n\n<p style='font-size=0.7rem;'>Last updated: {utc_now}</p>"
 
     async with aiohttp.ClientSession() as session:
         if not await check_api_up(session):
@@ -225,7 +231,7 @@ async def update_news(ctx, *, content: str):
             "X-API-KEY": api_key,
             "Content-Type": "application/json"
         }
-        payload = { "content": content }
+        payload = { "content": content_with_timestamp }
 
         try:
             async with session.post("https://api.loopy5418.dev/admin/update-news", headers=headers, json=payload) as resp:

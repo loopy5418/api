@@ -202,5 +202,39 @@ async def on_ready():
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong!')
+    
+@bot.command(name="updatenews")
+async def update_news(ctx, *, content: str):
+    if not any(role.id == ADMIN_ROLE_ID for role in ctx.author.roles):
+        await ctx.send("You don't have permission to use this command.")
+        return
+
+    await ctx.trigger_typing()
+
+    async with aiohttp.ClientSession() as session:
+        if not await check_api_up(session):
+            await ctx.send("The API is currently down.")
+            return
+
+        api_key = get_admin_api_key()
+        if not api_key:
+            await ctx.send("Missing ADMIN_API_KEYS configuration.")
+            return
+
+        headers = {
+            "X-API-KEY": api_key,
+            "Content-Type": "application/json"
+        }
+        payload = { "content": content }
+
+        try:
+            async with session.post("https://api.loopy5418.dev/admin/update-news", headers=headers, json=payload) as resp:
+                data = await resp.json()
+                if data.get("success"):
+                    await ctx.send("News updated successfully.")
+                else:
+                    await ctx.send(f"Failed to update news: {data.get('message')}")
+        except Exception:
+            await ctx.send("Error occurred while updating the news.")
 
 bot.run(TOKEN)

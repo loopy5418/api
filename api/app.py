@@ -27,10 +27,58 @@ import calendar
 from dateutil import parser
 import pytz
 import markdown
-
+import discord
+import aiohttp
 gptc = Client()
-
 start_time = time.time()
+TEXT_FILE_EXTENSIONS = ['.txt', '.bat', '.md', '.csv', '.log', '.json', '.yaml', '.yml', '.xml', '.html']
+
+def run_async(coro):
+    return asyncio.run(coro)
+
+async def fetch_message_attachments(bot_token, channel_id, message_id):
+    intents = discord.Intents.default()
+    bot = discord.Client(intents=intents)
+
+    result = {}
+
+    @bot.event
+    async def on_ready():
+        try:
+            channel = await bot.fetch_channel(channel_id)
+            message = await channel.fetch_message(message_id)
+
+            attachments_info = []
+
+            for attachment in message.attachments:
+                info = {
+                    "filename": attachment.filename,
+                    "url": attachment.url
+                }
+
+                if any(attachment.filename.endswith(ext) for ext in TEXT_FILE_EXTENSIONS):
+                    try:
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(attachment.url) as resp:
+                                if resp.status == 200:
+                                    text = await resp.text()
+                                    info["content"] = text
+                                else:
+                                    info["content"] = f"Failed to fetch content: HTTP {resp.status}"
+                    except Exception as e:
+                        info["content"] = f"Error: {str(e)}"
+
+                attachments_info.append(info)
+
+            result["attachments"] = attachments_info
+
+        except Exception as e:
+            result["error"] = str(e)
+        finally:
+            await bot.close()
+
+    await bot.start(bot_token)
+    return result
 
 def is_admin():
     key = request.headers.get("X-API-KEY")
@@ -1150,3 +1198,24 @@ def parse_timestamp():
 
     except ValueError:
         return jsonify({"success": False, "error": "Invalid ISO 8601 timestamp format"}), 400
+        
+@app.route('/attachment-get', methods=['GET'])
+def attachment_get():
+    bot_token = request.args.get('bot_token')
+    message_id = request.args.get('message_id')
+    channel_id = request.args.get('channel_id')
+
+    if not all([bot_token, message_id, channel_id]):
+        return jsonify({'error': 'Missing query parameters'}), 400
+
+    try:
+        message_id = int(message_id)
+        channel_id = int(channel_id)
+    except ValueError:
+        return jsonify({'error': 'message_id and channel_id must be integers'}), 400
+
+    try:
+        data = run_async(fetch_message_attachments(bot_token, channel_id, message_id))
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

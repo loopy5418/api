@@ -29,9 +29,10 @@ import pytz
 import markdown
 import discord
 import aiohttp
+import mimetypes
 gptc = Client()
 start_time = time.time()
-TEXT_FILE_EXTENSIONS = ['.txt', '.bat', '.md', '.csv', '.log', '.json', '.yaml', '.yml', '.xml', '.html']
+TEXT_FILE_EXTENSIONS = ['.txt', '.js', '.bat', '.md', '.csv', '.log', '.json', '.yaml', '.yml', '.xml', '.html']
 
 def run_async(coro):
     return asyncio.run(coro)
@@ -45,18 +46,30 @@ async def fetch_message_attachments(bot_token, channel_id, message_id):
     @bot.event
     async def on_ready():
         try:
-            channel = await bot.fetch_channel(channel_id)
+            print(f"Logged in as {bot.user}")
+            channel = bot.get_channel(channel_id)
+            if channel is None:
+                print("Channel not in cache, fetching...")
+                channel = await bot.fetch_channel(channel_id)
+
             message = await channel.fetch_message(message_id)
+            print(f"Fetched message with ID {message.id}")
 
             attachments_info = []
 
             for attachment in message.attachments:
+                print(f"Found attachment: {attachment.filename}")
                 info = {
                     "filename": attachment.filename,
                     "url": attachment.url
                 }
 
-                if any(attachment.filename.endswith(ext) for ext in TEXT_FILE_EXTENSIONS):
+                # Guess file type from extension or mime
+                file_type, _ = mimetypes.guess_type(attachment.filename)
+                info["fileType"] = file_type if file_type else "unknown"
+
+                # Only fetch content for readable text files
+                if file_type and file_type.startswith("text"):
                     try:
                         async with aiohttp.ClientSession() as session:
                             async with session.get(attachment.url) as resp:
@@ -71,9 +84,11 @@ async def fetch_message_attachments(bot_token, channel_id, message_id):
                 attachments_info.append(info)
 
             result["attachments"] = attachments_info
+            result["success"] = True
 
         except Exception as e:
             result["error"] = str(e)
+            result["success"] = False
         finally:
             await bot.close()
 
@@ -1204,18 +1219,29 @@ def attachment_get():
     bot_token = request.args.get('bot_token')
     message_id = request.args.get('message_id')
     channel_id = request.args.get('channel_id')
+    apikey = request.args.get("key")
+    if not apikey:
+        return jsonify({
+            "error": "Missing API key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere",
+            "success": False
+        }), 400
+    if not checkapikey(apikey):
+        return jsonify({
+            "error": "Invalid API key",
+            "success": False
+        }), 403
 
     if not all([bot_token, message_id, channel_id]):
-        return jsonify({'error': 'Missing query parameters'}), 400
+        return jsonify({'success': False, 'error': 'Missing query parameters'}), 400
 
     try:
         message_id = int(message_id)
         channel_id = int(channel_id)
     except ValueError:
-        return jsonify({'error': 'message_id and channel_id must be integers'}), 400
+        return jsonify({'success': False, 'error': 'message_id and channel_id must be integers'}), 400
 
     try:
         data = run_async(fetch_message_attachments(bot_token, channel_id, message_id))
         return jsonify(data)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500

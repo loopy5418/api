@@ -900,6 +900,47 @@
 }</code></pre>
         </div>
       </div>
+      
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-attachmentget')">
+          <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+          <span class="flex-1 ml-2 text-lg">/get-attachments</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div id="endpoint-attachmentget" class="px-6 py-4 hidden border-t dark:border-gray-700">
+          <h3 class="font-semibold">Query Parameters</h3>
+          <ul class="list-disc pl-6 text-sm mb-4">
+            <li><strong>bot_token</strong>: Your bot token (required)</li>
+            <li><strong>channel_id</strong>: The channel ID of the message (required)</li>
+            <li><strong>message_id</strong>: The ID of the message (required)</li>
+            <li><strong>key</strong>: Your API key (required)</li>
+            <li><strong> We do not store your bot token at all. After the request ends, we immediately dispose of any data from you.</strong></li>
+          </ul>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Supports text files, images, videos and audio files.</p>
+          <h3 class="font-semibold">Example URL</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/get-attachments?bot_token=BOTTOKEN&channel_id=123456789&message_id=123456789&key=keyhere</p>
+          <h3 class="font-semibold">Response Preview</h3>
+          <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "attachments": [
+    {
+      "content": "Hello! This is the first attachment of a discord message.",
+      "fileType": "application/json",
+      "filename": "testingfile.json",
+      "url": "https://cdn.discordapp.com/attachments/123456789/123456789/testingfile.json"
+    },
+    {
+      "content": "Hello! This is the second attachment of a discord message.",
+      "fileType": "application/json",
+      "filename": "testingfile2.json",
+      "url": "https://cdn.discordapp.com/attachments/123456789/123456789/testingfile2.json"
+    }
+  ],
+  "success": true
+}</code></pre>
+        </div>
+      </div>
   </main>
 </body>
 </html>

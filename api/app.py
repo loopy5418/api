@@ -49,7 +49,7 @@ async def fetch_message_attachments(bot_token, channel_id, message_id):
             print(f"Logged in as {bot.user}")
             channel = bot.get_channel(channel_id)
             if channel is None:
-                print("Channel not in cache, fetching...")
+                print("Channel not in cache, fetching from API...")
                 channel = await bot.fetch_channel(channel_id)
 
             message = await channel.fetch_message(message_id)
@@ -64,12 +64,12 @@ async def fetch_message_attachments(bot_token, channel_id, message_id):
                     "url": attachment.url
                 }
 
-                # Guess file type from extension or mime
+                # Guess file type from mimetypes
                 file_type, _ = mimetypes.guess_type(attachment.filename)
                 info["fileType"] = file_type if file_type else "unknown"
 
-                # Only fetch content for readable text files
-                if file_type and file_type.startswith("text"):
+                # Check file extension manually to determine if we should fetch text content
+                if any(attachment.filename.lower().endswith(ext) for ext in TEXT_FILE_EXTENSIONS):
                     try:
                         async with aiohttp.ClientSession() as session:
                             async with session.get(attachment.url) as resp:

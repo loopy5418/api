@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, request, render_template, abort, redirect
+from flask import Flask, Response, jsonify, request, render_template, abort, redirect, send_file
 import psutil
 import platform
 import time
@@ -30,6 +30,9 @@ import markdown
 import discord
 import aiohttp
 import mimetypes
+from youtubesearchpython import VideosSearch
+from pytube import YouTube
+
 gptc = Client()
 start_time = time.time()
 TEXT_FILE_EXTENSIONS = ['.txt', '.js', '.bat', '.md', '.csv', '.log', '.json', '.yaml', '.yml', '.xml', '.html']
@@ -1245,3 +1248,33 @@ def attachment_get():
         return jsonify(data)
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+        
+
+@app.route('/yt-search', methods=['GET'])
+def search_youtube():
+    query = request.args.get('query')
+    limit = int(request.args.get('limit', 5))
+    if not isinstance(limit, (int, float)):
+        return jsonify({"error": "Limit parameter needs to be a number"}), 400
+    if not query:
+        return jsonify({"error": "Query parameter is required"}), 400
+
+    try:
+        videos_search = VideosSearch(query, limit=limit)
+        results = videos_search.result()
+
+        videos = [
+            {
+                'title': v['title'],
+                'url': v['link'],
+                'duration': v['duration'],
+                'views': v['viewCount']['short'],
+                'channel': v['channel']['name'],
+                'thumbnails': v['thumbnails']
+            }
+            for v in results['result']
+        ]
+        return jsonify(videos)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

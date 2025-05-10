@@ -1254,9 +1254,9 @@ def search_youtube():
     query = request.args.get('query')
     limit = int(request.args.get('limit', 5))
     if not isinstance(limit, (int, float)):
-        return jsonify({"error": "Limit parameter needs to be a number"}), 400
+        return jsonify({"error": "Limit parameter needs to be a number", "success": Falsre}), 400
     if not query:
-        return jsonify({"error": "Query parameter is required"}), 400
+        return jsonify({"error": "Query parameter is required", "success": False}), 400
 
     try:
         videos_search = VideosSearch(query, limit=limit)
@@ -1276,4 +1276,4 @@ def search_youtube():
         return jsonify(videos)
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e), "success": False}), 500

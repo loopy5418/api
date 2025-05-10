@@ -31,7 +31,6 @@ import discord
 import aiohttp
 import mimetypes
 from youtubesearchpython import VideosSearch
-from pytube import YouTube
 
 gptc = Client()
 start_time = time.time()

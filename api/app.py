@@ -1229,33 +1229,3 @@ def attachment_get():
         return jsonify(data)
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
-        
-
-@app.route('/yt-search', methods=['GET'])
-def search_youtube():
-    query = request.args.get('query')
-    limit = int(request.args.get('limit', 5))
-    if not isinstance(limit, (int, float)):
-        return jsonify({"error": "Limit parameter needs to be a number", "success": Falsre}), 400
-    if not query:
-        return jsonify({"error": "Query parameter is required", "success": False}), 400
-
-    try:
-        videos_search = VideosSearch(query, limit=limit)
-        results = videos_search.result()
-
-        videos = [
-            {
-                'title': v['title'],
-                'url': v['link'],
-                'duration': v['duration'],
-                'views': v['viewCount']['short'],
-                'channel': v['channel']['name'],
-                'thumbnails': v['thumbnails']
-            }
-            for v in results['result']
-        ]
-        return jsonify(videos)
-
-    except Exception as e:
-        return jsonify({"error": str(e), "success": False}), 500

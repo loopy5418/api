@@ -21,7 +21,6 @@ import psycopg2
 import urllib.parse as up
 import math
 import pyfiglet
-from g4f.client import Client
 import asyncio
 import calendar
 from dateutil import parser
@@ -32,7 +31,6 @@ import aiohttp
 import mimetypes
 from youtubesearchpython import VideosSearch
 
-gptc = Client()
 start_time = time.time()
 TEXT_FILE_EXTENSIONS = ['.txt', '.js', '.bat', '.md', '.csv', '.log', '.json', '.yaml', '.yml', '.xml', '.html']
 
@@ -983,71 +981,55 @@ def ascii_art():
         return jsonify({'success': True, 'ascii_art': ascii_output})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
-        
-@app.route('/ai/gpt-4o', methods=['GET'])
-def gpt4o():
-    text = request.args.get("prompt")
-    websearch = request.args.get("web_search", False)
-    apikey = request.args.get("key")
-    if not apikey:
-        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
-    if not checkapikey(apikey):
-        return jsonify({"error": "Invalid API key", "success": False}), 403
-    if not text:
-        return jsonify({"error": "Missing 'prompt' parameter", "success": False})
-    try:
-        r = gptc.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": text}],
-            web_search=websearch
-        )
-        return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text})
-    except Exception as e:
-        return jsonify({"error": str(e), "success": False}), 500
 
 @app.route('/ai', methods=['GET'])
 def ai():
     text = request.args.get("prompt")
-    websearch = request.args.get("web_search", "false")
     apikey = request.args.get("key")
     modelreq = request.args.get("model")
+
     if not apikey:
-        return jsonify({"error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere", "success": False})
+        return jsonify({
+            "error": "Missing api key! Get it from our server at api.loopy5418.dev/support. Example: ?key=apikeyhere",
+            "success": False
+        })
+
     if not checkapikey(apikey):
         return jsonify({"error": "Invalid API key", "success": False}), 403
+
     if not text:
         return jsonify({"error": "Missing 'prompt' parameter", "success": False})
+
     if not modelreq:
         return jsonify({"error": "Missing 'model' parameter", "success": False})
-    if websearch.lower() == "true":
-        websearch = True
-    elif websearch.lower() == "false":
-        websearch = False
-    else:
-        return jsonify({"error": "Invalid 'web_search' value. Must be 'true' or 'false'", "success": False}), 400
+
     try:
-        r = gptc.chat.completions.create(
-            model=modelreq,
-            messages=[
-                {"role": "system", "content": "You are an AI service in an API called 'api.loopy5418.dev'. The API owner is Loopy5418. Refrain from providing data that is guessed. Refrain from any political, nsfw, or innapropiate question. Do what the user says, thank you." },
+        payload = {
+            "model": modelreq,
+            "messages": [
+                {"role": "system", "content": "You are an AI service in an API called 'api.loopy5418.dev'. The API owner is Loopy5418. Refrain from providing data that is guessed. Refrain from any political, nsfw, or inappropriate question. Do what the user says, thank you."},
                 {"role": "user", "content": text}
-            ],
-            web_search=websearch
-        )
-        return jsonify({"response": r.choices[0].message.content, "success": True, "prompt": text, "model": modelreq})
+            ]
+        }
+
+        response = requests.post("https://text.pollinations.ai/openai", json=payload)
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to fetch from pollinations.ai", "details": response.text, "success": False}), response.status_code
+
+        data = response.json()
+        message = data["choices"][0]["message"]["content"]
+        refusal = data["choices"][0]["message"].get("refusal", None)
+        filters = data["choices"][0]["content_filter_results"]
+
+        return jsonify({
+            "response": message,
+            "refused": refusal,
+            "filter_results": filters,
+            "success": True
+        })
+
     except Exception as e:
-        error_msg = str(e)
-        not_found_msg = f"Model {modelreq} not found in any provider."
-        if error_msg == not_found_msg:
-            return jsonify({
-                "error": "That model doesn't exist, or is unavailable at the moment. See the supported models in the docs.",
-                "success": False
-            }), 400
-        else:
-            return jsonify({
-                "error": error_msg,
-                "success": False
-            }), 500
+        return jsonify({"error": str(e), "success": False}), 500
 
 @app.route('/roblox-user-search', methods=['GET'])
 def roblox_user_search():

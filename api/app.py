@@ -982,11 +982,11 @@ def ascii_art():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/ai', methods=['GET'])
-def ai():
+@app.route('/openai/text', methods=['GET'])
+def openai_text():
     text = request.args.get("prompt")
     apikey = request.args.get("key")
-    modelreq = request.args.get("model")
+    speed = request.args.get("speed", "balanced").lower()
 
     if not apikey:
         return jsonify({
@@ -1000,31 +1000,49 @@ def ai():
     if not text:
         return jsonify({"error": "Missing 'prompt' parameter", "success": False})
 
-    if not modelreq:
-        return jsonify({"error": "Missing 'model' parameter", "success": False})
+    # Determine model based on speed
+    speed_to_model = {
+        "balanced": "openai",
+        "fast": "openai-fast",
+        "large": "openai-large"
+    }
+    model = speed_to_model.get(speed)
+
+    if not model:
+        return jsonify({"error": "Invalid 'speed' value. Must be 'balanced', 'fast', or 'large'", "success": False}), 400
 
     try:
         payload = {
-            "model": modelreq,
+            "model": model,
             "messages": [
-                {"role": "system", "content": "You are an AI service in an API called 'api.loopy5418.dev'. The API owner is Loopy5418. Refrain from providing data that is guessed. Refrain from any political, nsfw, or inappropriate question. Do what the user says, thank you."},
+                {
+                    "role": "system",
+                    "content": "You are an AI service in an API called 'api.loopy5418.dev'. The API owner is Loopy5418. Refrain from providing data that is guessed. Refrain from any political, nsfw, or inappropriate question. Do what the user says, thank you."
+                },
                 {"role": "user", "content": text}
             ]
         }
 
         response = requests.post("https://text.pollinations.ai/openai", json=payload)
         if response.status_code != 200:
-            return jsonify({"error": "Failed to fetch from pollinations.ai", "details": response.text, "success": False}), response.status_code
+            return jsonify({
+                "error": "Failed to fetch from pollinations.ai",
+                "details": response.text,
+                "success": False
+            }), response.status_code
 
         data = response.json()
         message = data["choices"][0]["message"]["content"]
         refusal = data["choices"][0]["message"].get("refusal", None)
         filters = data["choices"][0]["content_filter_results"]
+        final_model = data.get("model", model)
 
         return jsonify({
             "response": message,
             "refused": refusal,
             "filter_results": filters,
+            "prompt": text,
+            "model": final_model,
             "success": True
         })
 

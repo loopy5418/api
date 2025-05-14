@@ -29,7 +29,7 @@ import markdown
 import discord
 import aiohttp
 import mimetypes
-from youtubesearchpython import VideosSearch
+import user_agents
 
 start_time = time.time()
 TEXT_FILE_EXTENSIONS = ['.txt', '.js', '.bat', '.md', '.csv', '.log', '.json', '.yaml', '.yml', '.xml', '.html']
@@ -1308,3 +1308,44 @@ def discord_timestamp_parts():
 
     except Exception as e:
         return jsonify({"error": f"Invalid date parts: {str(e)}", "success": False}), 400
+        
+@app.route('/my-ip', methods=['GET'])
+def my_ip():
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    ua_string = request.headers.get('User-Agent')
+    ua = user_agents.parse(ua_string)
+
+    screen_width = request.args.get('width')
+    screen_height = request.args.get('height')
+
+    return jsonify({
+        "ip": ip,
+        "user_agent": ua_string,
+        "accept_language": request.headers.get('Accept-Language'),
+        "forwarded_headers": {
+            "X-Forwarded-For": request.headers.get('X-Forwarded-For'),
+            "X-Real-IP": request.headers.get('X-Real-IP'),
+            "Forwarded": request.headers.get('Forwarded')
+        },
+        "device_info": {
+            "is_mobile": ua.is_mobile,
+            "is_tablet": ua.is_tablet,
+            "is_pc": ua.is_pc,
+            "is_bot": ua.is_bot,
+            "os": {
+                "name": ua.os.family,
+                "version": ua.os.version_string
+            },
+            "browser": {
+                "name": ua.browser.family,
+                "version": ua.browser.version_string
+            },
+            "device_brand": ua.device.brand,
+            "device_model": ua.device.model
+        },
+        "screen": {
+            "width": screen_width,
+            "height": screen_height
+        },
+        "success": True
+    })

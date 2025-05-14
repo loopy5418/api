@@ -1247,3 +1247,64 @@ def attachment_get():
         return jsonify(data)
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+        
+@app.route('/discord-timestamp/iso', methods=['GET'])
+def discord_timestamp_iso():
+    iso = request.args.get("iso")
+    tzname = request.args.get("tz", "UTC")
+    fmt = request.args.get("format", "F")
+
+    if not iso:
+        return jsonify({"error": "Missing 'iso' query parameter", "success": False}), 400
+
+    try:
+        tz = pytz.timezone(tzname)
+    except Exception:
+        return jsonify({"error": f"Invalid timezone: {tzname}", "success": False}), 400
+
+    try:
+        # Parse ISO string and convert to specified timezone
+        dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+        dt = dt.astimezone(tz)
+        unix_ts = int(dt.timestamp())
+
+        return jsonify({
+            "timestamp": unix_ts,
+            "discord_format": f"<t:{unix_ts}:{fmt}>",
+            "success": True,
+            "timezone": tzname
+        })
+    except Exception as e:
+        return jsonify({"error": f"Invalid ISO format: {str(e)}", "success": False}), 400
+        
+@app.route('/discord-timestamp/normal', methods=['GET'])
+def discord_timestamp_parts():
+    tzname = request.args.get("tz", "UTC")
+    fmt = request.args.get("format", "F")
+
+    try:
+        tz = pytz.timezone(tzname)
+    except Exception:
+        return jsonify({"error": f"Invalid timezone: {tzname}", "success": False}), 400
+
+    try:
+        year = int(request.args.get("year", 1970))
+        month = int(request.args.get("month", 1))
+        day = int(request.args.get("day", 1))
+        hour = int(request.args.get("hour", 0))
+        minute = int(request.args.get("minute", 0))
+        second = int(request.args.get("second", 0))
+
+        dt_naive = datetime(year, month, day, hour, minute, second)
+        dt = tz.localize(dt_naive)
+        unix_ts = int(dt.timestamp())
+
+        return jsonify({
+            "timestamp": unix_ts,
+            "discord_format": f"<t:{unix_ts}:{fmt}>",
+            "success": True,
+            "timezone": tzname
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"Invalid date parts: {str(e)}", "success": False}), 400

@@ -1067,6 +1067,52 @@
   </div>
 </div>
 
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mt-4">
+  <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-getip')">
+    <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+    <span class="flex-1 ml-2 text-lg">/my-ip</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  <div id="endpoint-getip" class="px-6 py-4 hidden border-t dark:border-gray-700">
+    <h3 class="font-semibold">Example URL</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/my-ip</p>
+    <h3 class="font-semibold">Response Preview</h3>
+    <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "accept_language": "en-US,en;q=0.9",
+  "device_info": {
+    "browser": {
+      "name": "HTTPBot",
+      "version": "2025.3.1"
+    },
+    "device_brand": "Spider",
+    "device_model": "Desktop",
+    "is_bot": true,
+    "is_mobile": false,
+    "is_pc": false,
+    "is_tablet": false,
+    "os": {
+      "name": "LoopyOS",
+      "version": "1.2.3"
+    }
+  },
+  "forwarded_headers": {
+    "Forwarded": null,
+    "X-Forwarded-For": "123.321.213.312, 123.321.213.312",
+    "X-Real-IP": null
+  },
+  "ip": "123.321.213.312, 123.321.213.312",
+  "screen": {
+    "height": 720,
+    "width": 1080
+  },
+  "success": true,
+  "user_agent": "HTTPBot/2025.3.1"
+}</code></pre>
+  </div>
+</div>
+
       <footer class="w-full mt-12 border-t border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 py-6 px-4 flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 dark:text-gray-400 rounded-t-xl">
         <div>
           <span class="font-semibold text-gray-800 dark:text-gray-200">api.loopy5418.dev</span>

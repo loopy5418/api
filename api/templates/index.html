@@ -949,6 +949,123 @@
 }</code></pre>
         </div>
       </div>
+      
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mt-4">
+  <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-timestampiso')">
+    <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+    <span class="flex-1 ml-2 text-lg">/discord-timestamp/iso</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  <div id="endpoint-timestampiso" class="px-6 py-4 hidden border-t dark:border-gray-700">
+    <h3 class="font-semibold">Query Parameters</h3>
+    <ul class="list-disc pl-6 text-sm mb-4">
+      <li><strong>iso</strong>: An ISO8601-formatted date string (required)</li>
+      <li><strong>tz</strong>: A timezone name (e.g., UTC, America/New_York) (optional, defaults to UTC)</li>
+      <li><strong>format</strong>: Discord format You can see what they look like below. (F, R, T, etc.) (optional, defaults to F)</li>
+    </ul>
+    <h3 class="font-semibold">Example URL</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/discord-timestamp/iso?iso=2025-12-25T15:00:00Z&tz=America/New_York&format=R</p>
+    <h3 class="font-semibold">Response Preview</h3>
+    <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "timestamp": 1766667600,
+  "discord_format": "<t:1766667600:R>",
+  "timezone": "America/New_York",
+  "success": true
+}</code></pre>
+  </div>
+</div>
+
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mt-4">
+  <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-timestampparts')">
+    <span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">GET</span>
+    <span class="flex-1 ml-2 text-lg">/discord-timestamp/normal</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  <div id="endpoint-timestampparts" class="px-6 py-4 hidden border-t dark:border-gray-700">
+    <h3 class="font-semibold">Query Parameters</h3>
+    <ul class="list-disc pl-6 text-sm mb-4">
+      <li><strong>year</strong>, <strong>month</strong>, <strong>day</strong>: Date parts (required)</li>
+      <li><strong>hour</strong>, <strong>minute</strong>, <strong>second</strong>: Time parts (optional, default 0)</li>
+      <li><strong>tz</strong>: A timezone name (e.g., UTC, Europe/London) (optional, defaults to UTC)</li>
+      <li><strong>format</strong>: Discord format. You can see what they look like below. (F, R, T, etc.) (optional, defaults to F)</li>
+    </ul>
+    <h3 class="font-semibold">Example URL</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400">https://api.loopy5418.dev/discord-timestamp/normal?year=2025&month=12&day=25&hour=15&tz=Asia/Tokyo&format=f</p>
+    <h3 class="font-semibold">Response Preview</h3>
+    <pre class="language-json rounded bg-gray-900 p-4 text-sm"><code>{
+  "timestamp": 1766722800,
+  "discord_format": "<t:1766722800:f>",
+  "timezone": "Asia/Tokyo",
+  "success": true
+}</code></pre>
+  </div>
+  <p style="font-size=0.6rem">Special thanks to 161.bmw for recommending this endpoint!</p>
+</div>
+
+<!-- Discord Timestamp Format Reference -->
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mt-4">
+  <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" onclick="toggleDetails('endpoint-timestampformats')">
+    <span class="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">INFO</span>
+    <span class="flex-1 ml-2 text-lg">Discord Timestamp Formats</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  <div id="endpoint-timestampformats" class="px-6 py-4 hidden border-t dark:border-gray-700">
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Discord allows different formats using a timestamp like <code>&lt;t:TIMESTAMP:FORMAT&gt;</code>. Below are the available format codes with examples:</p>
+    <table class="w-full text-sm text-left text-gray-600 dark:text-gray-300">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-300">
+        <tr>
+          <th scope="col" class="px-4 py-2">Format</th>
+          <th scope="col" class="px-4 py-2">Description</th>
+          <th scope="col" class="px-4 py-2">Example</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-800">
+        <tr class="border-t dark:border-gray-700">
+          <td class="px-4 py-2"><code>t</code></td>
+          <td class="px-4 py-2">Short time</td>
+          <td class="px-4 py-2">&lt;t:1760000000:t&gt; → <strong>4:26 PM</strong></td>
+        </tr>
+        <tr class="border-t dark:border-gray-700">
+          <td class="px-4 py-2"><code>T</code></td>
+          <td class="px-4 py-2">Long time</td>
+          <td class="px-4 py-2">&lt;t:1760000000:T&gt; → <strong>4:26:40 PM</strong></td>
+        </tr>
+        <tr class="border-t dark:border-gray-700">
+          <td class="px-4 py-2"><code>d</code></td>
+          <td class="px-4 py-2">Short date</td>
+          <td class="px-4 py-2">&lt;t:1760000000:d&gt; → <strong>11/8/2025</strong></td>
+        </tr>
+        <tr class="border-t dark:border-gray-700">
+          <td class="px-4 py-2"><code>D</code></td>
+          <td class="px-4 py-2">Long date</td>
+          <td class="px-4 py-2">&lt;t:1760000000:D&gt; → <strong>November 8, 2025</strong></td>
+        </tr>
+        <tr class="border-t dark:border-gray-700">
+          <td class="px-4 py-2"><code>f</code></td>
+          <td class="px-4 py-2">Short datetime</td>
+          <td class="px-4 py-2">&lt;t:1760000000:f&gt; → <strong>November 8, 2025 4:26 PM</strong></td>
+        </tr>
+        <tr class="border-t dark:border-gray-700">
+          <td class="px-4 py-2"><code>F</code></td>
+          <td class="px-4 py-2">Long datetime</td>
+          <td class="px-4 py-2">&lt;t:1760000000:F&gt; → <strong>Saturday, November 8, 2025 4:26 PM</strong></td>
+        </tr>
+        <tr class="border-t dark:border-gray-700">
+          <td class="px-4 py-2"><code>R</code></td>
+          <td class="px-4 py-2">Relative time</td>
+          <td class="px-4 py-2">&lt;t:1760000000:R&gt; → <strong>in 6 months</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
       <footer class="w-full mt-12 border-t border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 py-6 px-4 flex flex-col md:flex-row items-center justify-between text-sm text-gray-600 dark:text-gray-400 rounded-t-xl">
         <div>
           <span class="font-semibold text-gray-800 dark:text-gray-200">api.loopy5418.dev</span>

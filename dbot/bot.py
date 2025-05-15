@@ -243,4 +243,37 @@ async def update_news_cmd(ctx, *, content: str):
         except Exception:
             await ctx.send("Error occurred while updating the news.")
 
+@bot.event
+async def on_member_remove(member: discord.Member):
+    channel_id = 1365259997365272699  # Mod-only channel ID
+    notify_channel = bot.get_channel(channel_id)
+    
+    async with aiohttp.ClientSession() as session:
+        if not await check_api_up(session):
+            if notify_channel:
+                await notify_channel.send(f"{member} left the server, but the API is currently down.")
+            return
+
+        api_key = get_admin_api_key()
+        if not api_key:
+            if notify_channel:
+                await notify_channel.send(f"{member} left the server, but admin API key is not configured.")
+            return
+
+        url = f"https://api.loopy5418.dev/admin/delete-key?user_id={member.id}"
+        headers = {"X-API-KEY": api_key}
+
+        try:
+            async with session.delete(url, headers=headers) as resp:
+                data = await resp.json()
+                if data.get("success"):
+                    if notify_channel:
+                        await notify_channel.send(f"Revoked API key for {member}. They left the server.")
+                else:
+                    if notify_channel:
+                        await notify_channel.send(f"Failed to revoke API key for {member}: {data.get('message')}")
+        except Exception as e:
+            if notify_channel:
+                await notify_channel.send(f"Error revoking API key for {member}: {str(e)}")
+
 bot.run(TOKEN)

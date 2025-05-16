@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ wiki.title }}</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 1em; }
+    pre { background: #f6f6f6; padding: 1em; overflow-x: auto; }
+    .meta { font-size: 0.9em; color: #666; margin-top: 0.5em; }
+  </style>
+</head>
+<body>
+  <a href="/">Return to index</a> | <a href="/wikis">Back to all wikis</a>
+  <h1>{{ wiki.title }}</h1>
+  <p>{{ wiki.description }}</p>
+  <div class="meta">Posted on {{ wiki.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+  <hr>
+  <pre>{{ wiki.content }}</pre>
+</body>
+</html>

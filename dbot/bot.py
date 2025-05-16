@@ -276,4 +276,48 @@ async def on_member_remove(member: discord.Member):
             if notify_channel:
                 await notify_channel.send(f"Error revoking API key for {member}: {str(e)}")
 
+@bot.command(name="addWiki")
+async def add_wiki(ctx: commands.Context, title: str = None, desc: str = None, *, rest: str = None):
+    # Check for admin role
+    if not any(role.id == ADMIN_ROLE_ID for role in ctx.author.roles):
+        await ctx.send("You don't have permission to use this command.")
+        return
+
+    # Validate inputs
+    if not title or not desc or not rest:
+        await ctx.send('Usage: `!addWiki "Title" "Description"` followed by code (multiline supported).')
+        return
+
+    await ctx.send("Creating wiki entry...")
+
+    # Prepare API request
+    api_key = get_admin_api_key()
+    if not api_key:
+        await ctx.send("Missing ADMIN_API_KEYS configuration.")
+        return
+
+    payload = {
+        "title": title,
+        "description": desc,
+        "content": rest,
+        "author_id": str(ctx.author.id)
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "X-API-KEY": api_key
+    }
+
+    async with aiohttp.ClientSession() as session:
+        if not await check_api_up(session):
+            await ctx.send("API is currently down.")
+            return
+
+        async with session.post("https://api.loopy5418.dev/wikis/new", json=payload, headers=headers) as resp:
+            data = await resp.json()
+            if data.get("success"):
+                await ctx.send(f"✅ Wiki entry created: `{title}`")
+            else:
+                await ctx.send(f"❌ Failed to create wiki: {data.get('message', 'Unknown error')}")
+
 bot.run(TOKEN)

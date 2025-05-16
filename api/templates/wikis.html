@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}All Wikis – MyWikiApp{% endblock %}
+
+{% block content %}
+  <h1>All Wikis</h1>
+
+  <form method="get" action="{{ url_for('list_wikis') }}" class="search-form">
+    <input
+      type="text"
+      name="q"
+      placeholder="Search wikis…"
+      value="{{ query|e }}"
+      aria-label="Search wikis"
+    >
+    <button type="submit">🔍 Search</button>
+  </form>
+
+  {% if wikis %}
+    <ul class="wiki-list">
+      {% for wiki in wikis %}
+        <li class="wiki-item">
+          <a href="{{ url_for('wiki_detail', wiki_id=wiki.id) }}">
+            <h2>{{ wiki.title }}</h2>
+          </a>
+          <p>{{ wiki.description }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No wikis found{% if query %} matching “{{ query|e }}”{% endif %}.</p>
+  {% endif %}
+{% endblock %}

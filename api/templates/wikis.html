@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>All Wikis</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 1em; }
+    header { margin-bottom: 2em; }
+    .wiki { padding: 1em; border-bottom: 1px solid #ddd; }
+    .wiki h2 { margin: 0 0 0.3em; }
+    .actions { margin-bottom: 1em; }
+    input#search { width: 60%; padding: 0.5em; }
+    button { padding: 0.5em 1em; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/">Return to index</a>
+    <h1>Wikis</h1>
+    <div class="actions">
+      <a href="/wikis/new">➕ Add new wiki</a>
+    </div>
+    <input id="search" placeholder="Search by title or description…">
+  </header>
+
+  <div id="wiki-list">
+    <!-- JS will inject <div class="wiki">…</div> here -->
+  </div>
+
+  <script>
+    let allWikis = [];
+
+    async function fetchWikis() {
+      try {
+        const res = await fetch('/api/wikis');
+        if (!res.ok) throw new Error('Failed to load');
+        allWikis = await res.json();
+        renderList(allWikis);
+      } catch (e) {
+        document.getElementById('wiki-list')
+                .innerHTML = '<p style="color:red">Error loading wikis.</p>';
+      }
+    }
+
+    function renderList(arr) {
+      const container = document.getElementById('wiki-list');
+      if (!arr.length) {
+        container.innerHTML = '<p>No wikis found.</p>';
+        return;
+      }
+      container.innerHTML = arr.map(w => `
+        <div class="wiki">
+          <h2><a href="/wikis/${w.id}">${escapeHTML(w.title)}</a></h2>
+          <p>${escapeHTML(w.description)}</p>
+        </div>
+      `).join('');
+    }
+
+    function escapeHTML(s) {
+      return s.replace(/&/g,'&amp;')
+              .replace(/</g,'&lt;')
+              .replace(/>/g,'&gt;')
+              .replace(/"/g,'&quot;')
+              .replace(/'/g,'&#39;');
+    }
+
+    document.getElementById('search')
+      .addEventListener('input', e => {
+        const q = e.target.value.trim().toLowerCase();
+        if (!q) return renderList(allWikis);
+        const filtered = allWikis.filter(w =>
+          w.title.toLowerCase().includes(q) ||
+          w.description.toLowerCase().includes(q)
+        );
+        renderList(filtered);
+      });
+
+    fetchWikis();
+  </script>
+</body>
+</html>

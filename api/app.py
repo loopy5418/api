@@ -1408,7 +1408,7 @@ def api_post_wiki():
     desc  = data.get('description','').strip()
     content = data.get('content','')
     if not title or not desc or not content:
-        return jsonify({"error":"title, description, content are required"}), 400
+        return jsonify({"error":"title, description, content are required", "success": False}), 400
 
     conn = get_db()
     cur = conn.cursor()
@@ -1420,7 +1420,7 @@ def api_post_wiki():
     new_id = cur.fetchone()[0]
     conn.commit()
     conn.close()
-    return jsonify({"id": new_id}), 201
+    return jsonify({"id": new_id, "success": True}), 201
     
 @app.route('/wiki', methods=['GET'])
 def renderwikilist():

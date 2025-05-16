@@ -313,7 +313,7 @@ async def add_wiki(ctx: commands.Context, title: str = None, desc: str = None, *
             await ctx.send("API is currently down.")
             return
 
-        async with session.post("https://api.loopy5418.dev/wikis/new", json=payload, headers=headers) as resp:
+        async with session.post("https://api.loopy5418.dev/wiki/make", json=payload, headers=headers) as resp:
             data = await resp.json()
             if data.get("success"):
                 await ctx.send(f"✅ Wiki entry created: `{title}`")

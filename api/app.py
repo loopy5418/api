@@ -31,6 +31,7 @@ import discord
 import aiohttp
 import mimetypes
 import user_agents
+from psycopg2.extras import RealDictCursor
 
 start_time = time.time()
 TEXT_FILE_EXTENSIONS = ['.txt', '.js', '.bat', '.md', '.csv', '.log', '.json', '.yaml', '.yml', '.xml', '.html']
@@ -173,6 +174,15 @@ def init_db():
         CREATE TABLE IF NOT EXISTS site_news (
             id SERIAL PRIMARY KEY,
             content TEXT
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS wikis (
+            id SERIAL PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
         )
     ''')
     conn.commit()
@@ -1353,3 +1363,43 @@ def my_ip():
         },
         "success": True
     })
+    
+
+@app.route('/api/wikis', methods=['GET'])
+def api_get_wikis():
+    """Return all wikis as JSON."""
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT id, title, description
+        FROM wikis
+        ORDER BY created_at DESC
+    """)
+    w = cur.fetchall()
+    conn.close()
+    # jsonify handles serialization of RealDictCursor rows
+    return jsonify(w)
+
+
+@app.route('/api/wikis', methods=['POST'])
+def api_post_wiki():
+    """Create a new wiki via JSON payload (admin only)."""
+    is_admin()
+    data = request.get_json(force=True)
+    title = data.get('title','').strip()
+    desc  = data.get('description','').strip()
+    content = data.get('content','')
+    if not title or not desc or not content:
+        return jsonify({"error":"title, description, content are required"}), 400
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO wikis (title, description, content)
+        VALUES (%s,%s,%s)
+        RETURNING id
+    """, (title, desc, content))
+    new_id = cur.fetchone()[0]
+    conn.commit()
+    conn.close()
+    return jsonify({"id": new_id}), 201

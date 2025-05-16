@@ -1,65 +1,111 @@
+<!-- templates/wikis.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>All Wikis</title>
   <style>
+    /* Base */
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --text: #e0e0e0;
+      --muted: #888;
+      --primary: #bb86fc;
+      --accent: #03dac6;
+      --border: #333;
+      --radius: 6px;
+      --spacing: 1rem;
+      --font-size: 1rem;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
     body {
-      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-family: sans-serif;
+      line-height: 1.4;
+      font-size: var(--font-size);
+      padding: var(--spacing);
       max-width: 800px;
-      margin: 2em auto;
-      padding: 0 1em;
-      color: #333;
+      margin: auto;
     }
     header {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5em;
+      margin-bottom: var(--spacing);
     }
     header h1 {
-      margin: 0;
+      font-size: 1.5rem;
+      margin: var(--spacing) 0;
+    }
+    header a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
     }
     .actions a {
-      text-decoration: none;
-      background: #28a745;
-      color: white;
-      padding: 0.4em 0.8em;
-      border-radius: 4px;
+      background: var(--primary);
+      color: var(--bg);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
     }
     #search {
       width: 100%;
-      padding: 0.5em;
-      margin: 1em 0;
-      box-sizing: border-box;
+      padding: 0.6rem;
+      margin: var(--spacing) 0;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      color: var(--text);
     }
     .wiki-item {
-      border: 1px solid #ddd;
-      padding: 1em;
-      margin-bottom: 1em;
-      border-radius: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: var(--spacing);
+      margin-bottom: var(--spacing);
     }
     .wiki-item h2 {
-      margin-top: 0;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .wiki-item p {
+      font-size: 1rem;
+      color: var(--muted);
     }
     .see-btn {
       display: inline-block;
-      margin-top: 0.8em;
+      margin-top: 0.8rem;
+      background: var(--accent);
+      color: var(--bg);
       text-decoration: none;
-      background: #007bff;
-      color: white;
-      padding: 0.4em 0.8em;
-      border-radius: 4px;
+      padding: 0.5rem 0.8rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+    }
+    @media (max-width: 480px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .actions { margin-top: 0.5rem; }
+      .see-btn { width: 100%; text-align: center; }
     }
   </style>
 </head>
 <body>
+
   <header>
-    <div><a href="/">← Return to index</a></div>
+    <a href="/">← Return to index</a>
     <h1>Wikis</h1>
   </header>
 
-  <input type="text" id="search" placeholder="Search by title or description…">
+  <input
+    type="text"
+    id="search"
+    placeholder="Search by title or description…">
 
   <div id="wiki-list">
     <!-- JS will render wiki items here -->
@@ -76,17 +122,17 @@
         renderList(allWikis);
       } catch (err) {
         document.getElementById('wiki-list').innerHTML =
-          '<p style="color:red">Error loading wikis.</p>';
+          '<p style="color: #f44336">Error loading wikis.</p>';
       }
     }
 
     function renderList(arr) {
-      const container = document.getElementById('wiki-list');
+      const c = document.getElementById('wiki-list');
       if (!arr.length) {
-        container.innerHTML = '<p>No wikis found.</p>';
+        c.innerHTML = '<p>No wikis found.</p>';
         return;
       }
-      container.innerHTML = arr.map(w => `
+      c.innerHTML = arr.map(w => `
         <div class="wiki-item">
           <h2>${escapeHTML(w.title)}</h2>
           <p>${escapeHTML(w.description)}</p>
@@ -115,7 +161,6 @@
       );
     });
 
-    // Initial load
     fetchWikis();
   </script>
 </body>

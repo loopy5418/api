@@ -1367,18 +1367,17 @@ def my_ip():
 
 @app.route('/api/wikis', methods=['GET'])
 def api_get_wikis():
-    """Return all wikis as JSON."""
+    """Return all wikis (including content) as JSON."""
     conn = get_db()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     cur.execute("""
-        SELECT id, title, description
+        SELECT id, title, description, content, created_at
         FROM wikis
         ORDER BY created_at DESC
     """)
-    w = cur.fetchall()
+    wikis = cur.fetchall()
     conn.close()
-    # jsonify handles serialization of RealDictCursor rows
-    return jsonify(w)
+    return jsonify(wikis)
 
 
 @app.route('/api/wikis', methods=['POST'])

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Add Wiki</title>
+  <style>
+    body { font-family: sans-serif; max-width: 700px; margin: auto; padding: 1em; }
+    label { display: block; margin-top: 1em; }
+    textarea, input { width: 100%; padding: 0.5em; }
+    button { margin-top: 1em; padding: 0.5em 1.5em; }
+  </style>
+</head>
+<body>
+  <a href="/">Return to index</a> | <a href="/wikis">Back to all wikis</a>
+  <h1>Add a New Wiki</h1>
+  <form method="POST" action="/wikis/new">
+    <label>
+      Title:
+      <input type="text" name="title" required>
+    </label>
+    <label>
+      Description:
+      <textarea name="description" rows="3" required></textarea>
+    </label>
+    <label>
+      Content:
+      <textarea name="content" rows="15" required></textarea>
+    </label>
+    <button type="submit">Post Wiki</button>
+  </form>
+</body>
+</html>

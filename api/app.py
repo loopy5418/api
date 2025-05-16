@@ -1421,3 +1421,7 @@ def api_post_wiki():
     conn.commit()
     conn.close()
     return jsonify({"id": new_id}), 201
+    
+@app.route('/wiki', methods=['GET'])
+def renderwikilist():
+    return render_template('wikis.html')

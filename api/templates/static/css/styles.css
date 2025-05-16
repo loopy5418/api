@@ -1,0 +1,40 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+header nav a {
+  margin-right: 1rem;
+  text-decoration: none;
+}
+
+.wiki-list {
+  list-style: none;
+  padding: 0;
+}
+
+.wiki-item {
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+}
+
+.search-form {
+  margin-bottom: 1rem;
+}
+
+.wiki-content pre {
+  background: #f5f5f5;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+footer {
+  margin-top: 2rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}

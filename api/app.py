@@ -1378,7 +1378,7 @@ def api_get_wikis():
     conn.close()
     return jsonify(wikis)
 
-@app.route('/wikis/<int:wiki_id>', methods=['GET'])
+@app.route('/wiki/<int:wiki_id>', methods=['GET'])
 def wiki_detail(wiki_id):
     """
     Fetch one wiki by ID and render it with wiki_detail.html.

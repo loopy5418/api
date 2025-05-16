@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, request, render_template, abort, redirect, send_file, flash
+from flask import Flask, Response, jsonify, request, render_template, abort, redirect, send_file, flash, url_for
 import psutil
 import platform
 import time
@@ -1416,3 +1416,32 @@ def wiki_detail(wiki_id):
                            description=description,
                            content=content,
                            created_at=created_at)
+                        
+@app.route('/wikis/create', methods=['GET', 'POST'])
+def create_wiki():
+    if request.method == 'POST':
+        title       = request.form.get('title', '').strip()
+        description = request.form.get('description', '').strip()
+        content     = request.form.get('content', '').strip()
+
+        # basic validation
+        if not title or not description or not content:
+            flash('All fields are required.', 'error')
+            # fall through to re-render form with flash
+        else:
+            conn = get_db()
+            cur  = conn.cursor()
+            cur.execute("""
+                INSERT INTO wikis (title, description, content)
+                VALUES (%s, %s, %s)
+                RETURNING id
+            """, (title, description, content))
+            new_id = cur.fetchone()[0]
+            conn.commit()
+            conn.close()
+            flash('Wiki created!', 'success')
+            # redirect to the detail view of your new wiki
+            return redirect(url_for('wiki_detail', wiki_id=new_id))
+
+    # GET or validation failure:
+    return render_template('create_wiki.html')

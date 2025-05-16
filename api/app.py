@@ -1,4 +1,4 @@
-from flask import Flask, Response, jsonify, request, render_template, abort, redirect, send_file, flash, url_for
+from flask import Flask, Response, jsonify, request, render_template, abort, redirect, send_file
 import psutil
 import platform
 import time
@@ -173,15 +173,6 @@ def init_db():
         CREATE TABLE IF NOT EXISTS site_news (
             id SERIAL PRIMARY KEY,
             content TEXT
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS wikis (
-            id SERIAL PRIMARY KEY,
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            content TEXT NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
     ''')
     conn.commit()
@@ -1362,86 +1353,3 @@ def my_ip():
         },
         "success": True
     })
-    
-    
-# LIST & SEARCH ALL WIKIS
-@app.route('/wikis')
-def list_wikis():
-    q = request.args.get('q', '').strip()
-    conn = get_db()
-    cur = conn.cursor()
-    if q:
-        # simple case‐insensitive search on title or description
-        like_q = f'%{q}%'
-        cur.execute("""
-            SELECT id, title, description
-            FROM wikis
-            WHERE title ILIKE %s OR description ILIKE %s
-            ORDER BY created_at DESC
-        """, (like_q, like_q))
-    else:
-        cur.execute("""
-            SELECT id, title, description
-            FROM wikis
-            ORDER BY created_at DESC
-        """)
-    wikis = [
-        {'id': row[0], 'title': row[1], 'description': row[2]}
-        for row in cur.fetchall()
-    ]
-    conn.close()
-    return render_template('wikis.html', wikis=wikis, query=q)
-
-# SHOW SINGLE WIKI DETAIL
-@app.route('/wikis/<int:wiki_id>')
-def wiki_detail(wiki_id):
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT title, description, content, created_at
-        FROM wikis
-        WHERE id = %s
-    """, (wiki_id,))
-    row = cur.fetchone()
-    conn.close()
-    if not row:
-        abort(404, description="Wiki not found")
-    title, description, content, created_at = row
-
-    # Convert UTC to local tz if desired
-    created_at = created_at.astimezone(tz.gettz('Europe/Istanbul'))
-
-    return render_template('wiki_detail.html',
-                           title=title,
-                           description=description,
-                           content=content,
-                           created_at=created_at)
-                        
-@app.route('/wikis/create', methods=['GET', 'POST'])
-def create_wiki():
-    if request.method == 'POST':
-        title       = request.form.get('title', '').strip()
-        description = request.form.get('description', '').strip()
-        content     = request.form.get('content', '').strip()
-
-        # basic validation
-        if not title or not description or not content:
-            flash('All fields are required.', 'error')
-            # fall through to re-render form with flash
-        else:
-            conn = get_db()
-            cur  = conn.cursor()
-            cur.execute("""
-                INSERT INTO wikis (title, description, content)
-                VALUES (%s, %s, %s)
-                RETURNING id
-            """, (title, description, content))
-            new_id = cur.fetchone()[0]
-            conn.commit()
-            conn.close()
-            flash('Wiki created!', 'success')
-            # redirect to the detail view of your new wiki
-            return redirect(url_for('wiki_detail', wiki_id=new_id))
-
-    # GET or validation failure:
-    return render_template('create_wiki.html')

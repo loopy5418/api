@@ -312,9 +312,49 @@ async def add_wiki(ctx: commands.Context, title: str = None, desc: str = None, *
         if not await check_api_up(session):
             await ctx.send("API is currently down.")
             return
-
         async with session.post("https://api.loopy5418.dev/wiki/make", json=payload, headers=headers) as resp:
             data = await resp.json()
-            await ctx.send(f"✅ Wiki entry created! ID: `{data.id}`")
+            if data.get("success"):
+                await ctx.send(f"✅ Wiki entry created: `{title}`")
+            else:
+                await ctx.send(f"❌ Failed to create wiki: {data.get('error', 'Unknown error')}")
+                
+
+@bot.command(name="deleteWiki")
+async def delete_wiki(ctx: commands.Context, wiki_id: str = None):
+    # Admin role check
+    if not any(role.id == ADMIN_ROLE_ID for role in ctx.author.roles):
+        await ctx.send("You don't have permission to use this command.")
+        return
+
+    # Validate input
+    if not wiki_id:
+        await ctx.send("Usage: `!deleteWiki <id>`")
+        return
+
+    await ctx.send(f"Deleting wiki entry `{wiki_id}`...")
+
+    api_key = get_admin_api_key()
+    if not api_key:
+        await ctx.send("Missing ADMIN_API_KEYS configuration.")
+        return
+
+    headers = {
+        "X-API-KEY": api_key
+    }
+
+    async with aiohttp.ClientSession() as session:
+        # Check API health first
+        if not await check_api_up(session):
+            await ctx.send("API is currently down.")
+            return
+
+        url = f"https://api.loopy5418.dev/wiki/delete/{wiki_id}"
+        async with session.delete(url, headers=headers) as resp:
+            data = await resp.json()
+            if data.get("success"):
+                await ctx.send(f"✅ Successfully deleted wiki `{data['deleted_id']}`.")
+            else:
+                await ctx.send(f"❌ Failed to delete wiki: {data.get('error', 'Unknown error')}")
 
 bot.run(TOKEN)

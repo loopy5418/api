@@ -1365,9 +1365,8 @@ def my_ip():
     })
     
 
-@app.route('/api/wikis', methods=['GET'])
+@app.route('/wiki/get', methods=['GET'])
 def api_get_wikis():
-    """Return all wikis (including content) as JSON."""
     conn = get_db()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     cur.execute("""
@@ -1380,9 +1379,8 @@ def api_get_wikis():
     return jsonify(wikis)
 
 
-@app.route('/api/wikis', methods=['POST'])
+@app.route('/wiki/make', methods=['POST'])
 def api_post_wiki():
-    """Create a new wiki via JSON payload (admin only)."""
     is_admin()
     data = request.get_json(force=True)
     title = data.get('title','').strip()

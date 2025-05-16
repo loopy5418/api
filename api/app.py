@@ -1378,6 +1378,27 @@ def api_get_wikis():
     conn.close()
     return jsonify(wikis)
 
+@app.route('/wikis/<int:wiki_id>', methods=['GET'])
+def wiki_detail(wiki_id):
+    """
+    Fetch one wiki by ID and render it with wiki_detail.html.
+    """
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute("""
+        SELECT id, title, description, content, created_at
+        FROM wikis
+        WHERE id = %s
+    """, (wiki_id,))
+    wiki = cur.fetchone()
+    conn.close()
+
+    if not wiki:
+        # No such wiki → 404
+        abort(404, description="Wiki not found")
+
+    # Pass the dict to the template
+    return render_template('wiki_detail.html', wiki=wiki)
 
 @app.route('/wiki/make', methods=['POST'])
 def api_post_wiki():

@@ -1426,13 +1426,9 @@ def api_post_wiki():
 def renderwikilist():
     return render_template('wikis.html')
     
-@app.route('/wiki/delete', methods=['POST'])
-def delete_wiki():
+@app.route('/wiki/delete/<int:wiki_id>', methods=['DELETE'])
+def delete_wiki(wiki_id):
     is_admin()  # Check for admin API key
-
-    wiki_id = request.json.get("id")
-    if not wiki_id:
-        return jsonify({"error": "Missing wiki ID"}), 400
 
     conn = get_db()
     cur = conn.cursor()
@@ -1442,6 +1438,6 @@ def delete_wiki():
     conn.close()
 
     if deleted == 0:
-        return jsonify({"error": "Wiki not found"}), 404
+        return jsonify({"error": "Wiki not found", "success": False}), 404
 
     return jsonify({"success": True, "deleted_id": wiki_id})
